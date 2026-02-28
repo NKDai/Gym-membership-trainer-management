@@ -101,7 +101,7 @@ void mm_GenerateNewID(MemberManager *mb_manager, char *id)
 		  	 
     }
 
-    id[0] = '\0';
+    id = "NULL";
 }
 
 void mm_MemberManagement_AddingMember(MemberManager *mb_member_manager)
@@ -113,13 +113,20 @@ void mm_MemberManagement_AddingMember(MemberManager *mb_member_manager)
 	Member new_member;
 	Member *point_to_new_member = &new_member;
 	
+	mm_GenerateNewID(mb_member_manager, id);
+	
 	Clear();
+	if(strcmp(id, "NULL")==0)
+	{
+		Noti("Member list is full, you can not add new member!");
+		return;
+	}
+	
 	printf("ADDING MEMBER MODE\n");
 	printf("Enter member full-name: ");
 	scanf(" %[^\n]s", &name);
 	membership_type = mm_InputMembershipType("Enter membership type");
 	
-	mm_GenerateNewID(mb_member_manager, id);
 	mb_SetID(point_to_new_member, id);
 	mb_SetName(point_to_new_member, name);
 	mb_SetMembershipType(point_to_new_member, membership_type);
