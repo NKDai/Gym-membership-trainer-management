@@ -21,8 +21,11 @@ void mm_DisplayAllMembers(MemberManager *mb_manager);
 // Display all members as a grid board
 
 
-void mm_SearchMember(MemberManager *mb_manager, char *id, Member **selector);
+void mm_SearchMemberByID(MemberManager *mb_manager, char *id, Member **selector);
 // Use to search a member by input an ID
+
+void mm_SearchMemberByName(MemberManager *mb_manager, char *name, MemberManager *selectors);
+// Use to search a member by input any string or char
 
 // ---------------------------------------------------------------------------------------------------------------------- COMPLETED FUNCTIONS
 
@@ -48,10 +51,16 @@ void mm_MemberManagement_DisplayingAllMembers(MemberManager *mb_manager);
 // Then use mm_DisplayAllMembers to show all member
 // Last, pause program before back to menu
 
-void mm_MemberManagement_SearchingMember(MemberManager *mb_manager);
+void mm_MemberManagement_SearchingMemberByID(MemberManager *mb_manager);
 // Clear screen
 // Use to let user enter member ID, check ID valid 
 // Print out the information about selected member
+// Pause program before back to menu
+
+void mm_MemberManagement_SearchingMemberByName(MemberManager *mb_manager);
+// Clear screen
+// Use to let user enter member fullname 
+// Print out the information of all members have the same fullname
 // Pause program before back to menu
 
 void mm_MemberManagement_ChangingMemberInfo(MemberManager *mb_manager);
@@ -74,14 +83,23 @@ void mm_InputMemberID(char *msg, char *id);
 // *msg is use to show what user must do
 
 int mm_InputMembershipType(char *msg);
-// Use to input and check if the membership type selected is correct
+// Use to input and check if the membership type is valid
 // If correct -> return the value as int
 // If not correct -> let user type again
-// *msg is use to show what user must do
+// *msg is use to show guide
+
+int mm_InputBirthYear(char *msg);
+// Use to input and check if the birth year is valid
+// If correct -> return the value as int
+// if not correct -> let user type again
+// *msg is use to show guide
 
 void mm_MemberManagement();
 // Main function of MemberManagement
 // This function show Menu and give user action to use other sub-function about member management.
+
+int mm_GetMemberIndex(MemberManager *mb_manager, char id[]);
+// Return member index in member list by using ID to find
 
 // ---------------------------------------------------------------------------------------------------------------------- MENU FUNCTIONS
 void mm_MemberManagement_Menu();
@@ -96,4 +114,5 @@ void mm_MemberManagement_MakeSureMenu();
 void mm_MemberManagement_InfoListMenu();
 // The menu that show options in ChangingMemberInfo
 // [1] change fullname, [2] change membership type, [0] quit
+
 #endif
