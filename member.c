@@ -7,7 +7,7 @@
 int number_of_membership_types = 4;
 char *membership_types[] = {"broze", "silver", "gold", "platinum"};
 
-void mb_StringDate(RegistrationDate date, char **string_date)
+void mb_StringDate(Date date, char **string_date)
 {
 	int size_of_date = 11; // 00/00/0000 +'\0'= 11
 	
@@ -18,7 +18,7 @@ void mb_StringDate(RegistrationDate date, char **string_date)
 	snprintf(*string_date, size_of_date, "%02d/%02d/%04d", date.day, date.month, date.year);
 }
 
-void mb_PrintMembershipList()
+void mb_PrintMembershipTypesList()
 {
 	for(int i=0; i<number_of_membership_types; i++)
 	{
@@ -38,11 +38,13 @@ void mb_PrintMemberInfo(Member *member)
 	mb_StringDate(member->registration_date, &registration_date);
 	
 	printf("%-20s : %s\n"
+       "%-20s : %d\n"
        "%-20s : %s\n"
        "%-20s : %s\n"
        "%-20s : %s\n"
        "%-20s : %s\n",
        "Member full name", member->name,
+       "Member birth year", member->birth_year,
        "Member ID",        member->id,
        "Membership type", membership_types[member->membership_type],
        "Registration date", registration_date,
@@ -65,6 +67,11 @@ void mb_SetID(Member *member, char id[])
 void mb_SetMembershipType(Member *member, int membership_type)
 {
 	member->membership_type= membership_type;
+}
+
+void mb_SetBirthYear(Member *member, int birth_year)
+{
+	member->birth_year= birth_year;
 }
 
 void mb_SetTrainerID(Member *member, char *trainer_id)
