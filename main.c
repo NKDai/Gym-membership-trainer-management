@@ -6,30 +6,28 @@
 #include "member.h"
 #include "MemberManagement.h"
 
-#include "GlobalFunctions.h"
-
 #include "trainermag.h"
+
+#include "GlobalFunctions.h"
 
 void Menu()
 {
-	printf("[1] Member Management\n");
-	printf("[2] Trainer Management\n");
-	printf("[3] Sort\n");
-	printf("[4] Save Data\n");
-	printf("[0] Quit\n");
+	printf("[1] Member Management                        \n");
+	printf("[2] Trainer Management                       \n");
+	printf("[3] Sort                                     \n");
+	printf("[4] Save Data                                \n");
+	printf("-----------------------------------------------\n");
+	printf("[9] Settings                                 \n");
+	printf("[0] Quit                                     \n");
 }
-
-
 int main()
 {
 	
-	DarkTheme();
+	LightTheme();
 	
-	MemberManager mm = {0, NULL};
+	MemberManager member_manager = {0, NULL};
 	MemberManager *member_manager_selector;
-	member_manager_selector = &mm;
-	
-//	mm_MemberManagement(member_manager_selector);
+	member_manager_selector = &member_manager;
 	
 	int running=1;
 	int action;
@@ -37,9 +35,9 @@ int main()
 	do
 	{
 		Clear();
-		printf("--------------- GYM MANAGEMENT --------------\n");
+		printf(" --------------- GYM MANAGEMENT ---------------\n");
 		Menu();
-		printf("---------------------------------------------\n");
+		printf(" ----------------------------------------------\n");
 		action = InputIntValue("Enter your choice");
 		
 		switch(action)
