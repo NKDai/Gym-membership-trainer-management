@@ -18,6 +18,6 @@ void Noti(char *notification);
 int InputIntValue(char *msg);
 // return integer if the input is an integer. Else -> return 999
 
-int IsDigit(char *input);
-// use to check if a string input is a digit or not
+int IsInteger(char *input);
+// use to check if a string input is a integer or not
 #endif
