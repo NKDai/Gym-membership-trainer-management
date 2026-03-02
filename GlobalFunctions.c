@@ -1,8 +1,9 @@
 #include <ctype.h>
-#include "GlobalFunctions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "GlobalFunctions.h"
 
 void Clear()
 {
@@ -19,7 +20,7 @@ void DarkTheme()
 	system("color 0f");
 }
 
-void WhiteTheme()
+void LightTheme()
 {
 	system("color f0");
 }
@@ -30,31 +31,41 @@ void Noti(char *notification)
 	Pause();
 }
 
-int InputIntValue(char *msg)
+int IsInteger(char *input)
 {
-	char input[255];
-	
-	printf("%s :", msg);
-	scanf("%s", &input);
-	
-	if(IsDigit(input))
-    {
-    	return atoi(input);
-	}
-	else
-	{
-		return 999;
-	}
-}
+    if (input == NULL || *input == '\0')
+        return 0;
 
-int IsDigit(char *input)
-{
     int i = 0;
+
+    if (input[i] == '+' || input[i] == '-')
+    {
+        i++;
+        if (input[i] == '\0')
+            return 0;
+    }
+
     while (input[i] != '\0')
     {
-        if (!isdigit(input[i]))
+        if (!isdigit((unsigned char)input[i]))
             return 0;
         i++;
     }
+
     return 1;
+}
+
+int InputIntValue(char *msg)
+{
+    char input[255];
+
+    printf("%s: ", msg);
+
+    if (scanf("%254s", input) != 1)
+        return 999;
+
+    if (IsInteger(input))
+        return atoi(input);
+
+    return 999;
 }
