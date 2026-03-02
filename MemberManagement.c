@@ -43,7 +43,7 @@ int mm_InputBirthYear(char *msg)
 		if(birth_year <= 0 || birth_year > current_year)
 		{
 			Clear();
-			printf("Your birth year must between %d to %d !\n", 0, current_year);
+			printf("Your birth year must between %d and %d !\n", 0, current_year);
 		}
 		
 	}while(birth_year <= 0 || birth_year > current_year);
