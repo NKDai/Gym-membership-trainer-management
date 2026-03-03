@@ -23,19 +23,19 @@ struct Trainer
 };
 
 // Function declarations
-void addTrainer();
-void displayAllTrainers();
-void searchTrainerById();
-void searchTrainerByName();
-void editTrainer();
-void deleteTrainer();
-void displayMenu();
-void trainerManagementMenu();
-void assignMemberToTrainer();
-void removeMemberFromTrainer();
-void displayTrainerMembers();
-void saveTrainersToFile(struct Trainer trainers[], int count);
-int loadTrainersFromFile(struct Trainer trainers[]);
-void sortTrainersByName(struct Trainer trainers[], int count);
+void addTrainer();                                             // Add a new trainer
+void displayAllTrainers();                                     // Display all trainers
+void searchTrainerById();                                      // Search trainer by ID
+void searchTrainerByName();                                    // Search trainer by name
+void editTrainer();                                            // Edit trainer information
+void deleteTrainer();                                          // Delete a trainer
+void displayMenu();                                            // Display trainer management menu
+void trainerManagementMenu();                                  // Main menu loop for trainer management
+void assignMemberToTrainer();                                  // Assign a member to a trainer
+void removeMemberFromTrainer();                                // Remove a member from a trainer
+void displayTrainerMembers();                                  // Display members assigned to a trainer
+void saveTrainersToFile(struct Trainer trainers[], int count); // Save trainers to file
+int loadTrainersFromFile(struct Trainer trainers[]);           // Load trainers from file
+void sortTrainersByName(struct Trainer trainers[], int count); // Sort trainers by name
 
 #endif
