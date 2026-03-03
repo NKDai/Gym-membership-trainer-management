@@ -566,6 +566,9 @@ void trainerManagementMenu()
     }
 }
 
+// If you want to build trainer.c as a standalone program define
+// TRAINER_STANDALONE when compiling (e.g. -DTRAINER_STANDALONE).
+#ifdef TRAINER_STANDALONE
 int main()
 {
     // Load data from file at startup
@@ -580,3 +583,4 @@ int main()
 
     return 0;
 }
+#endif

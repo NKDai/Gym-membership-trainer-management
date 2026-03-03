@@ -38,4 +38,8 @@ void saveTrainersToFile(struct Trainer trainers[], int count); // Save trainers 
 int loadTrainersFromFile(struct Trainer trainers[]);           // Load trainers from file
 void sortTrainersByName(struct Trainer trainers[], int count); // Sort trainers by name
 
+// Globals (defined in trainer.c)
+extern struct Trainer trainers[MAX_TRAINERS];
+extern int trainerCount;
+
 #endif
