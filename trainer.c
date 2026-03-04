@@ -91,6 +91,7 @@ void addTrainer()
     trainers[slot] = newTrainer;
     trainerCount++;
     printf("\n[OK] SUCCESSFULLY ADDED TRAINER (ID: %s)\n", newTrainer.id);
+    saveTrainersToFile(trainers, trainerCount);
 }
 
 void displayAllTrainers()
@@ -234,6 +235,7 @@ void editTrainer()
             getchar();
 
             printf("\n[OK] Trainer information updated successfully!\n");
+            saveTrainersToFile(trainers, trainerCount);
             return;
         }
     }
@@ -274,6 +276,7 @@ void deleteTrainer()
                 trainers[i].memberCount = 0;
                 trainerCount--;
                 printf("[OK] Trainer deleted successfully!\n");
+                saveTrainersToFile(trainers, trainerCount);
             }
             else
             {
@@ -413,6 +416,7 @@ void assignMemberToTrainer()
             strcpy(trainers[i].memberIds[trainers[i].memberCount], memberId);
             trainers[i].memberCount++;
             printf("\n[OK] Member '%s' assigned to trainer '%s' successfully!\n", memberId, trainers[i].name);
+            saveTrainersToFile(trainers, trainerCount);
             return;
         }
     }
@@ -464,6 +468,7 @@ void removeMemberFromTrainer()
                     }
                     trainers[i].memberCount--;
                     printf("\n[OK] Member '%s' removed from trainer '%s' successfully!\n", memberId, trainers[i].name);
+                    saveTrainersToFile(trainers, trainerCount);
                     return;
                 }
             }
@@ -566,6 +571,9 @@ void trainerManagementMenu()
     }
 }
 
+// If you want to build trainer.c as a standalone program define
+// TRAINER_STANDALONE when compiling (e.g. -DTRAINER_STANDALONE).
+#ifdef TRAINER_STANDALONE
 int main()
 {
     // Load data from file at startup
@@ -580,3 +588,4 @@ int main()
 
     return 0;
 }
+#endif

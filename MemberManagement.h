@@ -3,12 +3,12 @@
 #include "member.h"
 // ---------------------------------------------------------------------------------------------------------------------- STRUCT
 
-typedef struct 
+typedef struct
 {
 	int count;
 	Member *members;
-	
-}MemberManager;
+
+} MemberManager;
 
 // ---------------------------------------------------------------------------------------------------------------------- CORE FUNCTIONS
 void mm_AddMember(MemberManager *mb_manager, Member member_info);
@@ -19,7 +19,6 @@ void mm_RemoveMember(MemberManager *mb_manager, int member_index);
 
 void mm_DisplayAllMembers(MemberManager *mb_manager);
 // Display all members as a grid board
-
 
 void mm_SearchMemberByID(MemberManager *mb_manager, char *id, Member **selector);
 // Use to search a member by input an ID
@@ -53,13 +52,13 @@ void mm_MemberManagement_DisplayingAllMembers(MemberManager *mb_manager);
 
 void mm_MemberManagement_SearchingMemberByID(MemberManager *mb_manager);
 // Clear screen
-// Use to let user enter member ID, check ID valid 
+// Use to let user enter member ID, check ID valid
 // Print out the information about selected member
 // Pause program before back to menu
 
 void mm_MemberManagement_SearchingMemberByName(MemberManager *mb_manager);
 // Clear screen
-// Use to let user enter member fullname 
+// Use to let user enter member fullname
 // Print out the information of all members have the same fullname
 // Pause program before back to menu
 
@@ -70,11 +69,10 @@ void mm_MemberManagement_ChangingMemberInfo(MemberManager *mb_manager);
 // Then, let user change the fullname or membership type as their selected action
 // Last, change member information, show notification and back to menu
 
-
 // ---------------------------------------------------------------------------------------------------------------------- CALCULATOR FUNCTIONS
 void mm_GenerateNewID(MemberManager *mb_manager, char *id);
-// Pick a non-used ID from GYM000 to GYM999 and write it into *id 
-// If all of the IDs are used -> write "NULL" into *id 
+// Pick a non-used ID from GYM000 to GYM999 and write it into *id
+// If all of the IDs are used -> write "NULL" into *id
 
 void mm_InputMemberID(char *msg, char *id);
 // Use to input and check if the ID selected is correct
@@ -93,11 +91,9 @@ int mm_InputBirthYear(char *msg);
 // If correct -> return the value as int
 // if not correct -> let user type again
 // *msg is use to show guide
-
-void mm_MemberManagement();
 // Main function of MemberManagement
 // This function show Menu and give user action to use other sub-function about member management.
-
+void mm_MemberManagement(MemberManager *mb_manager);
 int mm_GetMemberIndex(MemberManager *mb_manager, char id[]);
 // Return member index in member list by using ID to find
 
