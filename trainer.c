@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "trainermag.h"
+#include "GlobalFunctions.h"
 
 struct Trainer trainers[MAX_TRAINERS];
 int trainerCount = 0;
@@ -42,7 +43,7 @@ void addTrainer()
         }
         if (freeSlot == -1)
         {
-            printf("\n!!! SYSTEM FULLED CANNOT ADD MORE TRAINERS !!!\n");
+            Noti("!!! SYSTEM FULLED CANNOT ADD MORE TRAINERS !!!");
             return;
         }
         // otherwise we will reuse the hole below
@@ -54,11 +55,14 @@ void addTrainer()
     int nextNum = getNextTrainerNumber();
     if (nextNum == -1)
     {
-        printf("\n!!! NO AVAILABLE TRAINER ID FOUND !!!\n");
+        printf("!!! NO AVAILABLE TRAINER ID FOUND !!!");
         return;
     }
+    
     sprintf(newTrainer.id, "TRN%03d", nextNum);
-
+	
+	Clear();
+	
     printf("\n--- ADD NEW TRAINER ---\n");
     printf("ENTER TRAINER NAME : ");
     fgets(newTrainer.name, MAX_NAME, stdin);
@@ -91,6 +95,7 @@ void addTrainer()
     trainers[slot] = newTrainer;
     trainerCount++;
     printf("\n[OK] SUCCESSFULLY ADDED TRAINER (ID: %s)\n", newTrainer.id);
+    Pause();
     saveTrainersToFile(trainers, trainerCount);
 }
 
@@ -98,10 +103,10 @@ void displayAllTrainers()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS IN SYSTEM ***");
         return;
     }
-
+	Clear();
     printf("\n============================================ ALL TRAINERS LIST ============================================\n");
     printf("%-8s %-20s %-20s %-15s\n", "ID", "Name", "Specialty", "Salary (VND)");
     printf("==========================================================================================================\n");
@@ -117,16 +122,17 @@ void displayAllTrainers()
                trainers[i].salary);
     }
     printf("==========================================================================================================\n");
+	Pause();
 }
 
 void searchTrainerById()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS IN SYSTEM ***");
         return;
     }
-
+	Clear();
     char searchId[10];
     printf("\nENTER TRAINER ID TO SEARCH (e.g., TRN001): ");
     fgets(searchId, 10, stdin);
@@ -142,20 +148,23 @@ void searchTrainerById()
             printf("Specialty: %s\n", trainers[i].specialty);
             printf("Salary: %.0f VND\n", trainers[i].salary);
             printf("===================================\n");
+            Pause();
             return;
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", searchId);
+    Pause();
 }
 
 void searchTrainerByName()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
     }
-
+    
+    Clear();
     char searchName[MAX_NAME];
     printf("\nENTER TRAINER NAME TO SEARCH: ");
     fgets(searchName, MAX_NAME, stdin);
@@ -186,16 +195,19 @@ void searchTrainerByName()
         printf("!!! NO TRAINER FOUND WITH NAME: %s !!!\n", searchName);
     }
     printf("======================================================================================================\n");
+	
+	Pause();
 }
 
 void editTrainer()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS IN SYSTEM ***");
         return;
     }
-
+	
+	Clear();
     char editId[10];
     printf("\nENTER TRAINER ID TO EDIT (e.g., TRN001): ");
     fgets(editId, 10, stdin);
@@ -240,15 +252,18 @@ void editTrainer()
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", editId);
+    Pause();
 }
 
 void deleteTrainer()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS IN SYSTEM ***");
         return;
     }
+	
+	Clear();
 
     char deleteId[10];
     printf("\nENTER TRAINER ID TO DELETE (e.g., TRN001): ");
@@ -286,6 +301,7 @@ void deleteTrainer()
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", deleteId);
+    Pause();
 }
 
 void saveTrainersToFile(struct Trainer trainers[], int count)
@@ -313,7 +329,7 @@ void saveTrainersToFile(struct Trainer trainers[], int count)
         }
     }
     fclose(file);
-    printf("[OK] DATA SAVED SUCCESSFULLY!\n");
+    Noti("[OK] DATA SAVED SUCCESSFULLY!");
 }
 
 int loadTrainersFromFile(struct Trainer trainers[])
@@ -340,9 +356,11 @@ void displayTrainerMembers()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS IN SYSTEM ***");
         return;
     }
+    
+    Clear();
 
     char searchId[10];
     printf("\nENTER TRAINER ID TO VIEW MEMBER LIST (e.g., TRN001): ");
@@ -372,15 +390,18 @@ void displayTrainerMembers()
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", searchId);
+	Pause();
 }
 
 void assignMemberToTrainer()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS IN SYSTEM ***");
         return;
     }
+    
+    Clear();
 
     char trainerId[10];
     printf("\nENTER TRAINER ID TO ASSIGN MEMBER (e.g., TRN001): ");
@@ -394,7 +415,8 @@ void assignMemberToTrainer()
             if (trainers[i].memberCount >= MAX_MEMBERS_PER_TRAINER)
             {
                 printf("\n!!! TRAINER '%s' HAS REACHED MAXIMUM MEMBER COUNT (%d)! !!!\n", trainers[i].name, MAX_MEMBERS_PER_TRAINER);
-                return;
+                Pause();
+				return;
             }
 
             char memberId[10];
@@ -408,6 +430,7 @@ void assignMemberToTrainer()
                 if (strcmp(trainers[i].memberIds[j], memberId) == 0)
                 {
                     printf("\n!!! Member '%s' already assigned to this trainer! !!!\n", memberId);
+                    Pause();
                     return;
                 }
             }
@@ -417,20 +440,24 @@ void assignMemberToTrainer()
             trainers[i].memberCount++;
             printf("\n[OK] Member '%s' assigned to trainer '%s' successfully!\n", memberId, trainers[i].name);
             saveTrainersToFile(trainers, trainerCount);
+            Pause();
             return;
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", trainerId);
+    Pause();
 }
 
 void removeMemberFromTrainer()
 {
     if (trainerCount == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS IN SYSTEM ***");
         return;
     }
-
+	
+	Clear();
+	
     char trainerId[10];
     printf("\nENTER TRAINER ID TO REMOVE MEMBER (e.g., TRN001): ");
     fgets(trainerId, 10, stdin);
@@ -469,14 +496,17 @@ void removeMemberFromTrainer()
                     trainers[i].memberCount--;
                     printf("\n[OK] Member '%s' removed from trainer '%s' successfully!\n", memberId, trainers[i].name);
                     saveTrainersToFile(trainers, trainerCount);
+                    Pause();
                     return;
                 }
             }
             printf("\n!!! Member '%s' not found in trainer's list! !!!\n", memberId);
+            Pause();
             return;
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", trainerId);
+    Pause();
 }
 
 void sortTrainersByName(struct Trainer trainers[], int count)
@@ -493,7 +523,7 @@ void sortTrainersByName(struct Trainer trainers[], int count)
             }
         }
     }
-    printf("\n[OK] Trainers sorted by name successfully!\n");
+    Noti("\n[OK] Trainers sorted by name successfully!\n");
 }
 
 void displayMenu()
@@ -519,12 +549,15 @@ void displayMenu()
 
 void trainerManagementMenu()
 {
+	trainerCount = loadTrainersFromFile(trainers);
     int choice;
 
     while (1)
     {
+    	Clear();
         displayMenu();
-        scanf("%d", &choice);
+        
+        choice = InputIntValue("Enter your action");
         getchar();
 
         switch (choice)
@@ -563,29 +596,11 @@ void trainerManagementMenu()
             removeMemberFromTrainer();
             break;
         case 0:
-            printf("\n[OK] RETURN TO MAIN MENU!\n");
+            Noti("RETURN TO MAIN MENU!");
             return; // Return to main menu
         default:
-            printf("!!! INVALID OPTION !!!\n");
+            Noti("!!! INVALID OPTION !!!");
         }
     }
 }
 
-// If you want to build trainer.c as a standalone program define
-// TRAINER_STANDALONE when compiling (e.g. -DTRAINER_STANDALONE).
-#ifdef TRAINER_STANDALONE
-int main()
-{
-    // Load data from file at startup
-    trainerCount = loadTrainersFromFile(trainers);
-    if (trainerCount > 0)
-    {
-        printf("[OK] Data loaded successfully from file. %d trainers loaded.\n", trainerCount);
-    }
-
-    // Start trainer management submenu
-    trainerManagementMenu();
-
-    return 0;
-}
-#endif

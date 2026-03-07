@@ -15,16 +15,6 @@ void Pause()
 	system("Pause");
 }
 
-void DarkTheme()
-{
-	system("color 0f");
-}
-
-void LightTheme()
-{
-	system("color f0");
-}
-
 void Noti(char *notification)
 {
 	printf("[%s]\n", notification);
@@ -57,7 +47,7 @@ int IsInteger(char *input)
 
 int InputIntValue(char *msg)
 {
-    char input[255];
+    char input[100];
 
     printf("%s: ", msg);
 

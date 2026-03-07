@@ -115,7 +115,7 @@ void mm_MemberManagement_CorrectDataMenu()
 
 void mm_GenerateNewID(MemberManager *mb_manager, char *id)
 {
-    for(int i=0; i<999; i++)
+    for(int i=0; i<MAX_MEMBERS; i++)
     {
         snprintf(id, 7, "GYM%03d", i);
 
@@ -470,11 +470,33 @@ void mm_MemberManagement_ChangingMemberInfo(MemberManager *mb_manager) // name/m
 	}while(action!=0);
 }
 
+void LoadData(MemberManager *mb_manager)
+{
+	FILE *f = fopen(MEMBER_SAVE_FILE_NAME, "rb");
+	fread(&mb_manager->count, sizeof(int), 1, f);
+	
+	mb_manager->members = malloc(sizeof(Member)*mb_manager->count);
+	fread(mb_manager->members, sizeof(Member), mb_manager->count, f);
+	
+	fclose(f);
+}
+void SaveData(MemberManager *mb_manager)
+{
+	
+	FILE *f = fopen(MEMBER_SAVE_FILE_NAME, "wb");
+	fwrite(&mb_manager->count, sizeof(int), 1, f);
+	fwrite(mb_manager->members, sizeof(Member), mb_manager->count, f);
+	
+	fclose(f);
+}
+
 void mm_MemberManagement(MemberManager *mb_manager)
 {
     int running = 1;
     int action;
 
+	LoadData(mb_manager);
+	
     do {
         Clear();
         mm_MemberManagement_Menu();
@@ -487,9 +509,11 @@ void mm_MemberManagement(MemberManager *mb_manager)
                 break;
             case 2:
                 mm_MemberManagement_AddingMember(mb_manager);
+                SaveData(mb_manager);
                 break;
             case 3:
                 mm_MemberManagement_RemovingMember(mb_manager);
+                SaveData(mb_manager);
                 break;
             case 4:
                 mm_MemberManagement_SearchingMemberByID(mb_manager);
@@ -499,8 +523,10 @@ void mm_MemberManagement(MemberManager *mb_manager)
             	break;
             case 6:
             	mm_MemberManagement_ChangingMemberInfo(mb_manager);
+            	SaveData(mb_manager);
             	break;
             case 0:
+            	running=0;
                 break;
             default:
                 Noti("Invalid action, choice again!");
@@ -508,4 +534,6 @@ void mm_MemberManagement(MemberManager *mb_manager)
         }
 
     } while(running && action != 0);
+    
+    SaveData(mb_manager);
 }
