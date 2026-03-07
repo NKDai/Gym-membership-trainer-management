@@ -470,7 +470,7 @@ void mm_MemberManagement_ChangingMemberInfo(MemberManager *mb_manager) // name/m
 	}while(action!=0);
 }
 
-void LoadData(MemberManager *mb_manager)
+void mm_LoadData(MemberManager *mb_manager)
 {
 	FILE *f = fopen(MEMBER_SAVE_FILE_NAME, "rb");
 	fread(&mb_manager->count, sizeof(int), 1, f);
@@ -480,7 +480,7 @@ void LoadData(MemberManager *mb_manager)
 	
 	fclose(f);
 }
-void SaveData(MemberManager *mb_manager)
+void mm_SaveData(MemberManager *mb_manager)
 {
 	
 	FILE *f = fopen(MEMBER_SAVE_FILE_NAME, "wb");
@@ -495,7 +495,7 @@ void mm_MemberManagement(MemberManager *mb_manager)
     int running = 1;
     int action;
 
-	LoadData(mb_manager);
+	mm_LoadData(mb_manager);
 	
     do {
         Clear();
@@ -509,11 +509,11 @@ void mm_MemberManagement(MemberManager *mb_manager)
                 break;
             case 2:
                 mm_MemberManagement_AddingMember(mb_manager);
-                SaveData(mb_manager);
+                mm_SaveData(mb_manager);
                 break;
             case 3:
                 mm_MemberManagement_RemovingMember(mb_manager);
-                SaveData(mb_manager);
+                mm_SaveData(mb_manager);
                 break;
             case 4:
                 mm_MemberManagement_SearchingMemberByID(mb_manager);
@@ -523,7 +523,7 @@ void mm_MemberManagement(MemberManager *mb_manager)
             	break;
             case 6:
             	mm_MemberManagement_ChangingMemberInfo(mb_manager);
-            	SaveData(mb_manager);
+            	mm_SaveData(mb_manager);
             	break;
             case 0:
             	running=0;
@@ -535,5 +535,5 @@ void mm_MemberManagement(MemberManager *mb_manager)
 
     } while(running && action != 0);
     
-    SaveData(mb_manager);
+    mm_SaveData(mb_manager);
 }

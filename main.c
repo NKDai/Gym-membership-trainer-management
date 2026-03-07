@@ -11,10 +11,6 @@
 #include "GlobalFunctions.h"
 #include "Settings.h"
 
-void SaveData()
-{
-	
-}
 
 void SortMenu(MemberManager* mb_manager, Settings *settings)
 {
@@ -50,7 +46,7 @@ void Menu()
 int main()
 {	
 	Settings settings;
-	st_LoadSettings(&settings);
+//	st_LoadSettings(&settings);
 
 	MemberManager member_manager = {0, NULL};
 	TrainerManager trainer_manager = {0, 0, NULL};
@@ -75,11 +71,15 @@ int main()
 				mm_MemberManagement(&member_manager);
 				break;
 			case 2:
-				trainerManagementMenu(&trainer_manager);
+				tm_trainerManagementMenu(&trainer_manager);
 				break;
 			case 3:
-				SaveData();
+//				SaveData();
 				break;
+			case 0:
+				break;
+			default:
+				Noti("Invalid action!");
 		}
 		
 	}while(running && action!=0);		

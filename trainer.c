@@ -572,13 +572,9 @@ void tm_trainerManagementMenu(TrainerManager *tm_manager)
     {
         Clear();
         tm_displayMenu();
-        {
-            char menuBuf[8];
-            if (fgets(menuBuf, sizeof(menuBuf), stdin))
-                choice = atoi(menuBuf);
-            else
-                choice = -1;
-        }
+        
+        choice = InputIntValue("Enter your choice");
+        clearInputBuffer();
 
         Clear(); // Clear screen after selecting option
 
