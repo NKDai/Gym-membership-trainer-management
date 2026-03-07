@@ -53,8 +53,10 @@ int main()
 	st_LoadSettings(&settings);
 
 	MemberManager member_manager = {0, NULL};
-	MemberManager *member_manager_selector;
-	member_manager_selector = &member_manager;
+	TrainerManager trainer_manager = {0, 0, NULL};
+
+	mm_LoadData(&member_manager);
+	tm_loadTrainersFromFile(&trainer_manager);
 	
 	int running=1;
 	int action;
@@ -70,10 +72,10 @@ int main()
 		switch(action)
 		{
 			case 1:
-				mm_MemberManagement(member_manager_selector);
+				mm_MemberManagement(&member_manager);
 				break;
 			case 2:
-				trainerManagementMenu();
+				trainerManagementMenu(&trainer_manager);
 				break;
 			case 3:
 				SaveData();
@@ -82,3 +84,4 @@ int main()
 		
 	}while(running && action!=0);		
 }
+
