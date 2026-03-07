@@ -1,6 +1,7 @@
 #ifndef MEMBERMANAGEMENT_H
 #define MEMBERMANAGEMENT_H
 #include "member.h"
+#define MEMBERS_FILE "members.dat"
 // ---------------------------------------------------------------------------------------------------------------------- STRUCT
 
 typedef struct
@@ -17,8 +18,11 @@ void mm_AddMember(MemberManager *mb_manager, Member member_info);
 void mm_RemoveMember(MemberManager *mb_manager, int member_index);
 // Use to remove member from a MemberManager directly by the index of that member
 
-void mm_DisplayAllMembers(MemberManager *mb_manager);
-// Display all members as a grid board
+void mm_SaveMembersToFile(MemberManager *mb_manager);
+// Save members to file
+
+int mm_LoadMembersFromFile(MemberManager *mb_manager);
+// Load members from file
 
 void mm_SearchMemberByID(MemberManager *mb_manager, char *id, Member **selector);
 // Use to search a member by input an ID

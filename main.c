@@ -22,33 +22,38 @@ void Menu()
 }
 int main()
 {
-	
+
 	LightTheme();
-	
+
+	// Load trainer data
+	trainerCount = tm_loadTrainersFromFile(trainers);
+
 	MemberManager member_manager = {0, NULL};
 	MemberManager *member_manager_selector;
 	member_manager_selector = &member_manager;
-	
-	int running=1;
+
+	// Load member data
+	mm_LoadMembersFromFile(&member_manager);
+
+	int running = 1;
 	int action;
-	
+
 	do
 	{
 		Clear();
-		printf(" --------------- GYM MANAGEMENT ---------------\n");
 		Menu();
 		printf(" ----------------------------------------------\n");
 		action = InputIntValue("Enter your choice");
-		
-		switch(action)
+
+		switch (action)
 		{
-			case 1:
-				mm_MemberManagement(member_manager_selector);
-				break;
-			case 2:
-				trainerManagementMenu();
-				break;
+		case 1:
+			mm_MemberManagement(member_manager_selector);
+			break;
+		case 2:
+			tm_trainerManagementMenu();
+			break;
 		}
-		
-	}while(running && action!=0);		
+
+	} while (running && action != 0);
 }

@@ -7,28 +7,28 @@
 
 void Clear()
 {
-	system("cls");
+    system("cls");
 }
 
 void Pause()
 {
-	system("Pause");
+    system("Pause");
 }
 
 void DarkTheme()
 {
-	system("color 0f");
+    system("color 0f");
 }
 
 void LightTheme()
 {
-	system("color f0");
+    system("color f0");
 }
 
 void Noti(char *notification)
 {
-	printf("[%s]\n", notification);
-	Pause();
+    printf("[%s]\n", notification);
+    Pause();
 }
 
 int IsInteger(char *input)
@@ -60,12 +60,22 @@ int InputIntValue(char *msg)
     char input[255];
 
     printf("%s: ", msg);
-
-    if (scanf("%254s", input) != 1)
+    if (fgets(input, sizeof(input), stdin) == NULL)
         return 999;
+
+    // strip newline and any trailing whitespace
+    input[strcspn(input, "\n")] = 0;
 
     if (IsInteger(input))
         return atoi(input);
 
     return 999;
+}
+
+// consume everything left in stdin until newline or EOF
+void clearInputBuffer(void)
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
 }
