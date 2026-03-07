@@ -117,10 +117,10 @@ void mm_MemberManagement_InfoListMenu();
 
 
 // ---------------------------------------------------------------------------------------------------------------------- DATA WORKING
-void LoadData(MemberManager *mb_manager);
+void mm_LoadData(MemberManager *mb_manager);
 // Get data from file and write it to mb_manager
 
-void SaveData(MemberManager *mb_manager);
+void mm_SaveData(MemberManager *mb_manager);
 // Write data to file from mb_manager's data
 
 // ----------------------------------------------------------------------- MAIN

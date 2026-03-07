@@ -10,6 +10,8 @@ typedef struct
 	int current_sort_mode;//0, 1
 	
 }Settings;
+
+struct MemberManager;
 // --------------------------------------------------------------------
 
 extern char *theme_names[]; 
@@ -39,7 +41,7 @@ void st_ChangeAutoSaveMode(Settings *settings, int mode);
 void st_ChangeSortMode(Settings *settings, int mode);
 // Change current sort mode - 0 : show sorted list, 1 : show sorted list and save it into data
 
-void st_DeleteAllData(Settings *settings, MemberManager *member_manager);
+void st_DeleteAllData(Settings *settings, struct MemberManager *member_manager);
 // Clear all data in members.dat & trainers.dat
 
 void st_DefaultSettings(Settings *settings);
