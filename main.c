@@ -9,6 +9,33 @@
 #include "trainermag.h"
 
 #include "GlobalFunctions.h"
+#include "Settings.h"
+
+void SaveData()
+{
+	
+}
+
+void SortMenu(MemberManager* mb_manager, Settings *settings)
+{
+	int action;
+	do
+	{
+		Clear();
+		printf("SORT MODE\n");
+		printf("[1] Sort member by birth year\n");
+		printf("[2] Sort member by registration date\n");
+		action = InputIntValue("Enter your action: ");
+		switch(action)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	
+	}while(action!=0);
+}
 
 void Menu()
 {
@@ -21,10 +48,10 @@ void Menu()
 	printf("[0] Quit                                     \n");
 }
 int main()
-{
-	
-	LightTheme();
-	
+{	
+	Settings settings;
+	st_LoadSettings(&settings);
+
 	MemberManager member_manager = {0, NULL};
 	MemberManager *member_manager_selector;
 	member_manager_selector = &member_manager;
@@ -47,6 +74,9 @@ int main()
 				break;
 			case 2:
 				trainerManagementMenu();
+				break;
+			case 3:
+				SaveData();
 				break;
 		}
 		
