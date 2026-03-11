@@ -1,0 +1,43 @@
+# Project: FinalProject
+# Makefile created by Embarcadero Dev-C++ 6.3
+
+CPP      = g++.exe -D__DEBUG__
+CC       = gcc.exe -D__DEBUG__
+WINDRES  = windres.exe
+OBJ      = main.o member.o MemberManagement.o GlobalFunctions.o trainer.o Settings.o
+LINKOBJ  = main.o member.o MemberManagement.o GlobalFunctions.o trainer.o Settings.o
+LIBS     = -L"D:/Dev-Cpp/TDM-GCC-64/lib" -L"D:/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/lib" -static-libgcc -g3
+INCS     = -I"D:/Dev-Cpp/TDM-GCC-64/include" -I"D:/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"D:/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include"
+CXXINCS  = -I"D:/Dev-Cpp/TDM-GCC-64/include" -I"D:/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"D:/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include" -I"D:/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/c++"
+BIN      = FinalProject.exe
+CXXFLAGS = $(CXXINCS) -g3
+CFLAGS   = $(INCS) -g3
+DEL      = D:\Dev-Cpp\DevCpp.exe INTERNAL_DEL
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${DEL} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+main.o: main.c
+	$(CC) -c main.c -o main.o $(CFLAGS)
+
+member.o: member.c
+	$(CC) -c member.c -o member.o $(CFLAGS)
+
+MemberManagement.o: MemberManagement.c
+	$(CC) -c MemberManagement.c -o MemberManagement.o $(CFLAGS)
+
+GlobalFunctions.o: GlobalFunctions.c
+	$(CC) -c GlobalFunctions.c -o GlobalFunctions.o $(CFLAGS)
+
+trainer.o: trainer.c
+	$(CC) -c trainer.c -o trainer.o $(CFLAGS)
+
+Settings.o: Settings.c
+	$(CC) -c Settings.c -o Settings.o $(CFLAGS)

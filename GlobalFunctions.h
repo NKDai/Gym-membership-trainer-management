@@ -20,8 +20,4 @@ int InputIntValue(char *msg);
 
 int IsInteger(char *input);
 // use to check if a string input is a integer or not
-
-// flush any leftover characters (newlines etc.) from stdin so that
-// subsequent fgets calls don't immediately return an empty line
-void clearInputBuffer(void);
 #endif

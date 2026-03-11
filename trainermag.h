@@ -23,25 +23,28 @@ struct Trainer
     int memberCount;
 };
 
-// Function declarations
-void tm_addTrainer();                                             // Add a new trainer
-void tm_displayAllTrainers();                                     // Display all trainers
-void tm_searchTrainerById();                                      // Search trainer by ID
-void tm_searchTrainerByName();                                    // Search trainer by name
-void tm_editTrainer();                                            // Edit trainer information
-void tm_deleteTrainer();                                          // Delete a trainer
-void tm_displayMenu();                                            // Display trainer management menu
-void tm_trainerManagementMenu();                                  // Main menu loop for trainer management
-void tm_assignMemberToTrainer();                                  // Assign a member to a trainer
-void tm_removeMemberFromTrainer();                                // Remove a member from a trainer
-void tm_displayTrainerMembers();                                  // Display members assigned to a trainer
-void tm_saveTrainersToFile(struct Trainer trainers[], int count); // Save trainers to file
-int tm_loadTrainersFromFile(struct Trainer trainers[]);           // Load trainers from file
-void tm_sortTrainersByName(struct Trainer trainers[], int count); // Sort trainers by name
+// Trainer Manager struct
+typedef struct
+{
+    int count;
+    int capacity;
+    struct Trainer *trainers;
+} TrainerManager;
 
-// Globals (defined in trainer.c)
-extern struct Trainer *trainers;
-extern int trainerCount;
-extern int currentCapacity;
+// Function declarations
+void tm_addTrainer(TrainerManager *tm_manager);                   // Add a new trainer
+void tm_displayAllTrainers(TrainerManager *tm_manager);           // Display all trainers
+void tm_searchTrainerById(TrainerManager *tm_manager);            // Search trainer by ID
+void tm_searchTrainerByName(TrainerManager *tm_manager);          // Search trainer by name
+void tm_editTrainer(TrainerManager *tm_manager);                  // Edit trainer information
+void tm_deleteTrainer(TrainerManager *tm_manager);                // Delete a trainer
+void tm_displayMenu();                                            // Display trainer management menu
+void tm_trainerManagementMenu(TrainerManager *tm_manager);        // Main menu loop for trainer management
+void tm_assignMemberToTrainer(TrainerManager *tm_manager);        // Assign a member to a trainer
+void tm_removeMemberFromTrainer(TrainerManager *tm_manager);      // Remove a member from a trainer
+void tm_displayTrainerMembers(TrainerManager *tm_manager);        // Display members assigned to a trainer
+void tm_saveTrainersToFile(TrainerManager *tm_manager);           // Save trainers to file
+int tm_loadTrainersFromFile(TrainerManager *tm_manager);          // Load trainers from file
+void tm_sortTrainersByName(struct Trainer trainers[], int count); // Sort trainers by name
 
 #endif

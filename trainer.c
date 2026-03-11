@@ -2,35 +2,31 @@
 #include "trainermag.h"
 #include "GlobalFunctions.h" // for clearInputBuffer, Pause, etc.
 
-struct Trainer *trainers = NULL;
-int trainerCount = 0;
-int currentCapacity = 0;
-
 // Helper function to resize trainers array
-static void resizeTrainers(int newCapacity)
+static void resizeTrainers(TrainerManager *tm_manager, int newCapacity)
 {
     if (newCapacity > MAX_TRAINERS)
         newCapacity = MAX_TRAINERS;
-    trainers = realloc(trainers, newCapacity * sizeof(struct Trainer));
-    if (trainers == NULL)
+    tm_manager->trainers = realloc(tm_manager->trainers, newCapacity * sizeof(struct Trainer));
+    if (tm_manager->trainers == NULL)
     {
         printf("!!! MEMORY ALLOCATION FAILED !!!\n");
         exit(1);
     }
-    currentCapacity = newCapacity;
+    tm_manager->capacity = newCapacity;
 }
 
 // return smallest unused trainer number (1-based) or -1 if none available
-static int getNextTrainerNumber()
+static int getNextTrainerNumber(TrainerManager *tm_manager)
 {
     for (int num = 1; num <= MAX_TRAINERS; num++)
     {
         char idbuf[10];
         sprintf(idbuf, "TRN%03d", num);
         int used = 0;
-        for (int i = 0; i < currentCapacity; i++)
+        for (int i = 0; i < tm_manager->capacity; i++)
         {
-            if (strcmp(trainers[i].id, idbuf) == 0)
+            if (strcmp(tm_manager->trainers[i].id, idbuf) == 0)
             {
                 used = 1;
                 break;
@@ -42,23 +38,23 @@ static int getNextTrainerNumber()
     return -1;
 }
 
-void tm_addTrainer()
+void tm_addTrainer(TrainerManager *tm_manager)
 {
-    if (currentCapacity == 0)
+    if (tm_manager->capacity == 0)
     {
-        resizeTrainers(INITIAL_TRAINERS);
+        resizeTrainers(tm_manager, INITIAL_TRAINERS);
     }
-    if (trainerCount >= currentCapacity)
+    if (tm_manager->count >= tm_manager->capacity)
     {
-        resizeTrainers(currentCapacity * 2);
+        resizeTrainers(tm_manager, tm_manager->capacity * 2);
     }
-    if (trainerCount >= MAX_TRAINERS)
+    if (tm_manager->count >= MAX_TRAINERS)
     {
         // there may still be gaps if some entries were deleted earlier
         int freeSlot = -1;
-        for (int i = 0; i < currentCapacity; i++)
+        for (int i = 0; i < tm_manager->capacity; i++)
         {
-            if (trainers[i].id[0] == '\0')
+            if (tm_manager->trainers[i].id[0] == '\0')
             {
                 freeSlot = i;
                 break;
@@ -75,7 +71,7 @@ void tm_addTrainer()
     struct Trainer newTrainer;
 
     // determine next unused numeric ID (smallest missing number)
-    int nextNum = getNextTrainerNumber();
+    int nextNum = getNextTrainerNumber(tm_manager);
     if (nextNum == -1)
     {
         printf("\n!!! NO AVAILABLE TRAINER ID FOUND !!!\n");
@@ -108,24 +104,24 @@ void tm_addTrainer()
     int slot = -1;
     for (int i = 0; i < MAX_TRAINERS; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
         {
             slot = i;
             break;
         }
     }
     if (slot == -1)
-        slot = trainerCount; // append at end
+        slot = tm_manager->count; // append at end
 
-    trainers[slot] = newTrainer;
-    trainerCount++;
+    tm_manager->trainers[slot] = newTrainer;
+    tm_manager->count++;
     printf("\n[OK] SUCCESSFULLY ADDED TRAINER (ID: %s)\n", newTrainer.id);
-    tm_saveTrainersToFile(trainers, trainerCount);
+    tm_saveTrainersToFile(tm_manager);
 }
 
-void tm_displayAllTrainers()
+void tm_displayAllTrainers(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
@@ -135,22 +131,22 @@ void tm_displayAllTrainers()
     printf("%-8s %-20s %-20s %-15s\n", "ID", "Name", "Specialty", "Salary (VND)");
     printf("==========================================================================================================\n");
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
         printf("%-8s %-20s %-20s %-15.0f\n",
-               trainers[i].id,
-               trainers[i].name,
-               trainers[i].specialty,
-               trainers[i].salary);
+               tm_manager->trainers[i].id,
+               tm_manager->trainers[i].name,
+               tm_manager->trainers[i].specialty,
+               tm_manager->trainers[i].salary);
     }
     printf("==========================================================================================================\n");
 }
 
-void tm_searchTrainerById()
+void tm_searchTrainerById(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
@@ -161,17 +157,17 @@ void tm_searchTrainerById()
     fgets(searchId, 10, stdin);
     searchId[strcspn(searchId, "\n")] = 0;
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        if (strcmp(trainers[i].id, searchId) == 0)
+        if (strcmp(tm_manager->trainers[i].id, searchId) == 0)
         {
             printf("\n========== TRAINER INFORMATION ==========\n");
-            printf("ID: %s\n", trainers[i].id);
-            printf("Name: %s\n", trainers[i].name);
-            printf("Specialty: %s\n", trainers[i].specialty);
-            printf("Salary: %.0f VND\n", trainers[i].salary);
+            printf("ID: %s\n", tm_manager->trainers[i].id);
+            printf("Name: %s\n", tm_manager->trainers[i].name);
+            printf("Specialty: %s\n", tm_manager->trainers[i].specialty);
+            printf("Salary: %.0f VND\n", tm_manager->trainers[i].salary);
             printf("===================================\n");
             return;
         }
@@ -179,9 +175,9 @@ void tm_searchTrainerById()
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", searchId);
 }
 
-void tm_searchTrainerByName()
+void tm_searchTrainerByName(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
@@ -197,17 +193,17 @@ void tm_searchTrainerByName()
     printf("%-8s %-20s %-20s %-15s\n", "ID", "Name", "Specialty", "Salary (VND)");
     printf("======================================================================================================\n");
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        if (strstr(trainers[i].name, searchName) != NULL)
+        if (strstr(tm_manager->trainers[i].name, searchName) != NULL)
         {
             printf("%-8s %-20s %-20s %-15.0f\n",
-                   trainers[i].id,
-                   trainers[i].name,
-                   trainers[i].specialty,
-                   trainers[i].salary);
+                   tm_manager->trainers[i].id,
+                   tm_manager->trainers[i].name,
+                   tm_manager->trainers[i].specialty,
+                   tm_manager->trainers[i].salary);
             found = 1;
         }
     }
@@ -219,9 +215,9 @@ void tm_searchTrainerByName()
     printf("======================================================================================================\n");
 }
 
-void tm_editTrainer()
+void tm_editTrainer(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
@@ -232,30 +228,30 @@ void tm_editTrainer()
     fgets(editId, 10, stdin);
     editId[strcspn(editId, "\n")] = 0;
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        if (strcmp(trainers[i].id, editId) == 0)
+        if (strcmp(tm_manager->trainers[i].id, editId) == 0)
         {
             printf("--- EDITING TRAINER INFORMATION ---\n");
 
-            printf("1. Edit name (Current: %s): ", trainers[i].name);
+            printf("1. Edit name (Current: %s): ", tm_manager->trainers[i].name);
             char temp[MAX_NAME];
             if (fgets(temp, MAX_NAME, stdin) && temp[0] != '\n')
             {
                 temp[strcspn(temp, "\n")] = 0;
-                strcpy(trainers[i].name, temp);
+                strcpy(tm_manager->trainers[i].name, temp);
             }
 
-            printf("2. Edit specialty (Current: %s): ", trainers[i].specialty);
+            printf("2. Edit specialty (Current: %s): ", tm_manager->trainers[i].specialty);
             if (fgets(temp, MAX_NAME, stdin) && temp[0] != '\n')
             {
                 temp[strcspn(temp, "\n")] = 0;
-                strcpy(trainers[i].specialty, temp);
+                strcpy(tm_manager->trainers[i].specialty, temp);
             }
 
-            printf("3. Edit salary (Current: %.0f): ", trainers[i].salary);
+            printf("3. Edit salary (Current: %.0f): ", tm_manager->trainers[i].salary);
             {
                 char buf[32];
                 if (fgets(buf, sizeof(buf), stdin))
@@ -263,22 +259,22 @@ void tm_editTrainer()
                     float tempSalary;
                     if (sscanf(buf, "%f", &tempSalary) == 1)
                     {
-                        trainers[i].salary = tempSalary;
+                        tm_manager->trainers[i].salary = tempSalary;
                     }
                 }
             }
 
             printf("\n[OK] Trainer information updated successfully!\n");
-            tm_saveTrainersToFile(trainers, trainerCount);
+            tm_saveTrainersToFile(tm_manager);
             return;
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", editId);
 }
 
-void tm_deleteTrainer()
+void tm_deleteTrainer(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
@@ -289,13 +285,13 @@ void tm_deleteTrainer()
     fgets(deleteId, 10, stdin);
     deleteId[strcspn(deleteId, "\n")] = 0;
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        if (strcmp(trainers[i].id, deleteId) == 0)
+        if (strcmp(tm_manager->trainers[i].id, deleteId) == 0)
         {
-            printf("Are you sure you want to delete trainer '%s'? (y/n): ", trainers[i].name);
+            printf("Are you sure you want to delete trainer '%s'? (y/n): ", tm_manager->trainers[i].name);
             char confirm_buf[4];
             if (fgets(confirm_buf, sizeof(confirm_buf), stdin))
             {
@@ -303,14 +299,14 @@ void tm_deleteTrainer()
                 if (confirm == 'y' || confirm == 'Y')
                 {
                     // mark slot empty but keep other entries in place; this leaves a hole
-                    trainers[i].id[0] = '\0';
-                    trainers[i].name[0] = '\0';
-                    trainers[i].specialty[0] = '\0';
-                    trainers[i].salary = 0;
-                    trainers[i].memberCount = 0;
-                    trainerCount--;
+                    tm_manager->trainers[i].id[0] = '\0';
+                    tm_manager->trainers[i].name[0] = '\0';
+                    tm_manager->trainers[i].specialty[0] = '\0';
+                    tm_manager->trainers[i].salary = 0;
+                    tm_manager->trainers[i].memberCount = 0;
+                    tm_manager->count--;
                     printf("[OK] Trainer deleted successfully!\n");
-                    tm_saveTrainersToFile(trainers, trainerCount);
+                    tm_saveTrainersToFile(tm_manager);
                 }
                 else
                 {
@@ -323,7 +319,7 @@ void tm_deleteTrainer()
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", deleteId);
 }
 
-void tm_saveTrainersToFile(struct Trainer trainers[], int count)
+void tm_saveTrainersToFile(TrainerManager *tm_manager)
 {
     FILE *file = fopen(TRAINERS_FILE, "wb");
     if (file == NULL)
@@ -334,24 +330,24 @@ void tm_saveTrainersToFile(struct Trainer trainers[], int count)
 
     // write only non-empty trainers
     int actual = 0;
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] != '\0')
+        if (tm_manager->trainers[i].id[0] != '\0')
             actual++;
     }
     fwrite(&actual, sizeof(int), 1, file);
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] != '\0')
+        if (tm_manager->trainers[i].id[0] != '\0')
         {
-            fwrite(&trainers[i], sizeof(struct Trainer), 1, file);
+            fwrite(&tm_manager->trainers[i], sizeof(struct Trainer), 1, file);
         }
     }
     fclose(file);
     printf("[OK] DATA SAVED SUCCESSFULLY!\n");
 }
 
-int tm_loadTrainersFromFile(struct Trainer trainers[])
+int tm_loadTrainersFromFile(TrainerManager *tm_manager)
 {
     FILE *file = fopen(TRAINERS_FILE, "rb");
     if (file == NULL)
@@ -361,51 +357,49 @@ int tm_loadTrainersFromFile(struct Trainer trainers[])
 
     int count;
     fread(&count, sizeof(int), 1, file);
-    resizeTrainers(count);
+    resizeTrainers(tm_manager, count);
     // compact the data into the beginning of array
     for (int i = 0; i < count; i++)
     {
-        fread(&trainers[i], sizeof(struct Trainer), 1, file);
+        fread(&tm_manager->trainers[i], sizeof(struct Trainer), 1, file);
     }
     fclose(file);
 
+    tm_manager->count = count; // Set count directly in the struct
     return count;
 }
 
-void tm_displayTrainerMembers()
+void tm_displayTrainerMembers(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
     }
-
-    // clear newline left by menu input
-    clearInputBuffer();
 
     char searchId[10];
     printf("\nENTER TRAINER ID TO VIEW MEMBER LIST (e.g., TRN001): ");
     fgets(searchId, 10, stdin);
     searchId[strcspn(searchId, "\n")] = 0;
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        if (strcmp(trainers[i].id, searchId) == 0)
+        if (strcmp(tm_manager->trainers[i].id, searchId) == 0)
         {
-            printf("\n========== MEMBER LIST OF TRAINER %s =========\n", trainers[i].name);
-            if (trainers[i].memberCount == 0)
+            printf("\n========== MEMBER LIST OF TRAINER %s =========\n", tm_manager->trainers[i].name);
+            if (tm_manager->trainers[i].memberCount == 0)
             {
                 printf("No members assigned to this trainer.\n");
             }
             else
             {
-                printf("Total members: %d\n", trainers[i].memberCount);
+                printf("Total members: %d\n", tm_manager->trainers[i].memberCount);
                 printf("\nAssigned members:\n");
-                for (int j = 0; j < trainers[i].memberCount; j++)
+                for (int j = 0; j < tm_manager->trainers[i].memberCount; j++)
                 {
-                    printf("%d. %s\n", j + 1, trainers[i].memberIds[j]);
+                    printf("%d. %s\n", j + 1, tm_manager->trainers[i].memberIds[j]);
                 }
             }
             printf("===============================================\n");
@@ -415,31 +409,28 @@ void tm_displayTrainerMembers()
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", searchId);
 }
 
-void tm_assignMemberToTrainer()
+void tm_assignMemberToTrainer(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
     }
-
-    // clear newline from previous menu choice
-    clearInputBuffer();
 
     char trainerId[10];
     printf("\nENTER TRAINER ID TO ASSIGN MEMBER (e.g., TRN001): ");
     fgets(trainerId, 10, stdin);
     trainerId[strcspn(trainerId, "\n")] = 0;
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        if (strcmp(trainers[i].id, trainerId) == 0)
+        if (strcmp(tm_manager->trainers[i].id, trainerId) == 0)
         {
-            if (trainers[i].memberCount >= MAX_MEMBERS_PER_TRAINER)
+            if (tm_manager->trainers[i].memberCount >= MAX_MEMBERS_PER_TRAINER)
             {
-                printf("\n!!! TRAINER '%s' HAS REACHED MAXIMUM MEMBER COUNT (%d)! !!!\n", trainers[i].name, MAX_MEMBERS_PER_TRAINER);
+                printf("\n!!! TRAINER '%s' HAS REACHED MAXIMUM MEMBER COUNT (%d)! !!!\n", tm_manager->trainers[i].name, MAX_MEMBERS_PER_TRAINER);
                 return;
             }
 
@@ -449,9 +440,9 @@ void tm_assignMemberToTrainer()
             memberId[strcspn(memberId, "\n")] = 0;
 
             // Check if member already assigned
-            for (int j = 0; j < trainers[i].memberCount; j++)
+            for (int j = 0; j < tm_manager->trainers[i].memberCount; j++)
             {
-                if (strcmp(trainers[i].memberIds[j], memberId) == 0)
+                if (strcmp(tm_manager->trainers[i].memberIds[j], memberId) == 0)
                 {
                     printf("\n!!! Member '%s' already assigned to this trainer! !!!\n", memberId);
                     return;
@@ -459,48 +450,45 @@ void tm_assignMemberToTrainer()
             }
 
             // Add member
-            strcpy(trainers[i].memberIds[trainers[i].memberCount], memberId);
-            trainers[i].memberCount++;
-            printf("\n[OK] Member '%s' assigned to trainer '%s' successfully!\n", memberId, trainers[i].name);
-            tm_saveTrainersToFile(trainers, trainerCount);
+            strcpy(tm_manager->trainers[i].memberIds[tm_manager->trainers[i].memberCount], memberId);
+            tm_manager->trainers[i].memberCount++;
+            printf("\n[OK] Member '%s' assigned to trainer '%s' successfully!\n", memberId, tm_manager->trainers[i].name);
+            tm_saveTrainersToFile(tm_manager);
             return;
         }
     }
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", trainerId);
 }
 
-void tm_removeMemberFromTrainer()
+void tm_removeMemberFromTrainer(TrainerManager *tm_manager)
 {
-    if (trainerCount == 0)
+    if (tm_manager->count == 0)
     {
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
     }
-
-    // flush newline left by menu
-    clearInputBuffer();
 
     char trainerId[10];
     printf("\nENTER TRAINER ID TO REMOVE MEMBER (e.g., TRN001): ");
     fgets(trainerId, 10, stdin);
     trainerId[strcspn(trainerId, "\n")] = 0;
 
-    for (int i = 0; i < currentCapacity; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
-        if (trainers[i].id[0] == '\0')
+        if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        if (strcmp(trainers[i].id, trainerId) == 0)
+        if (strcmp(tm_manager->trainers[i].id, trainerId) == 0)
         {
-            if (trainers[i].memberCount == 0)
+            if (tm_manager->trainers[i].memberCount == 0)
             {
                 printf("\n*** TRAINER HAS NO MEMBERS! ***\n");
                 return;
             }
 
             printf("\nAssigned members:\n");
-            for (int j = 0; j < trainers[i].memberCount; j++)
+            for (int j = 0; j < tm_manager->trainers[i].memberCount; j++)
             {
-                printf("%d. %s\n", j + 1, trainers[i].memberIds[j]);
+                printf("%d. %s\n", j + 1, tm_manager->trainers[i].memberIds[j]);
             }
 
             char memberId[10];
@@ -508,18 +496,18 @@ void tm_removeMemberFromTrainer()
             fgets(memberId, 10, stdin);
             memberId[strcspn(memberId, "\n")] = 0;
 
-            for (int j = 0; j < trainers[i].memberCount; j++)
+            for (int j = 0; j < tm_manager->trainers[i].memberCount; j++)
             {
-                if (strcmp(trainers[i].memberIds[j], memberId) == 0)
+                if (strcmp(tm_manager->trainers[i].memberIds[j], memberId) == 0)
                 {
                     // Remove member by shifting array
-                    for (int k = j; k < trainers[i].memberCount - 1; k++)
+                    for (int k = j; k < tm_manager->trainers[i].memberCount - 1; k++)
                     {
-                        strcpy(trainers[i].memberIds[k], trainers[i].memberIds[k + 1]);
+                        strcpy(tm_manager->trainers[i].memberIds[k], tm_manager->trainers[i].memberIds[k + 1]);
                     }
-                    trainers[i].memberCount--;
-                    printf("\n[OK] Member '%s' removed from trainer '%s' successfully!\n", memberId, trainers[i].name);
-                    tm_saveTrainersToFile(trainers, trainerCount);
+                    tm_manager->trainers[i].memberCount--;
+                    printf("\n[OK] Member '%s' removed from trainer '%s' successfully!\n", memberId, tm_manager->trainers[i].name);
+                    tm_saveTrainersToFile(tm_manager);
                     return;
                 }
             }
@@ -567,7 +555,7 @@ void tm_displayMenu()
     printf("OPTION: ");
 }
 
-void tm_trainerManagementMenu()
+void tm_trainerManagementMenu(TrainerManager *tm_manager)
 {
     int choice;
 
@@ -575,56 +563,52 @@ void tm_trainerManagementMenu()
     {
         Clear();
         tm_displayMenu();
-        {
-            char menuBuf[8];
-            if (fgets(menuBuf, sizeof(menuBuf), stdin))
-                choice = atoi(menuBuf);
-            else
-                choice = -1;
-        }
+        
+        choice = InputIntValue("Enter your choice");
+        clearInputBuffer();
 
         Clear(); // Clear screen after selecting option
 
         switch (choice)
         {
         case 1:
-            tm_addTrainer();
+            tm_addTrainer(tm_manager);
             Pause();
             break;
         case 2:
-            tm_displayAllTrainers();
+            tm_displayAllTrainers(tm_manager);
             Pause();
             break;
         case 3:
-            tm_searchTrainerById();
+            tm_searchTrainerById(tm_manager);
             Pause();
             break;
         case 4:
-            tm_searchTrainerByName();
+            tm_searchTrainerByName(tm_manager);
             Pause();
             break;
         case 5:
-            tm_editTrainer();
+            tm_editTrainer(tm_manager);
             Pause();
             break;
         case 6:
-            tm_deleteTrainer();
+            tm_deleteTrainer(tm_manager);
             Pause();
             break;
         case 7:
-            tm_sortTrainersByName(trainers, trainerCount);
+            tm_sortTrainersByName(tm_manager->trainers, tm_manager->count);
             Pause();
             break;
         case 8:
-            tm_displayTrainerMembers();
+            tm_displayTrainerMembers(tm_manager);
             Pause();
             break;
         case 9:
-            tm_assignMemberToTrainer();
+            tm_assignMemberToTrainer(tm_manager);
             Pause();
             break;
         case 10:
-            tm_removeMemberFromTrainer();
+            tm_removeMemberFromTrainer(tm_manager);
             Pause();
             break;
         case 0:
@@ -636,22 +620,3 @@ void tm_trainerManagementMenu()
         }
     }
 }
-
-// If you want to build trainer.c as a standalone program define
-// TRAINER_STANDALONE when compiling (e.g. -DTRAINER_STANDALONE).
-#ifdef TRAINER_STANDALONE
-int main()
-{
-    // Load data from file at startup
-    trainerCount = loadTrainersFromFile(trainers);
-    if (trainerCount > 0)
-    {
-        printf("[OK] Data loaded successfully from file. %d trainers loaded.\n", trainerCount);
-    }
-
-    // Start trainer management submenu
-    trainerManagementMenu();
-
-    return 0;
-}
-#endif

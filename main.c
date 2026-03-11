@@ -9,6 +9,29 @@
 #include "trainermag.h"
 
 #include "GlobalFunctions.h"
+#include "Settings.h"
+
+
+void SortMenu(MemberManager* mb_manager, Settings *settings)
+{
+	int action;
+	do
+	{
+		Clear();
+		printf("SORT MODE\n");
+		printf("[1] Sort member by birth year\n");
+		printf("[2] Sort member by registration date\n");
+		action = InputIntValue("Enter your action: ");
+		switch(action)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+		}
+	
+	}while(action!=0);
+}
 
 void Menu()
 {
@@ -21,39 +44,44 @@ void Menu()
 	printf("[0] Quit                                     \n");
 }
 int main()
-{
-
-	LightTheme();
-
-	// Load trainer data
-	trainerCount = tm_loadTrainersFromFile(trainers);
+{	
+	Settings settings;
+//	st_LoadSettings(&settings);
 
 	MemberManager member_manager = {0, NULL};
-	MemberManager *member_manager_selector;
-	member_manager_selector = &member_manager;
+	TrainerManager trainer_manager = {0, 0, NULL};
 
-	// Load member data
-	mm_LoadMembersFromFile(&member_manager);
-
-	int running = 1;
+	mm_LoadData(&member_manager);
+	tm_loadTrainersFromFile(&trainer_manager);
+	
+	int running=1;
 	int action;
-
+	
 	do
 	{
 		Clear();
+		printf(" --------------- GYM MANAGEMENT ---------------\n");
 		Menu();
 		printf(" ----------------------------------------------\n");
 		action = InputIntValue("Enter your choice");
-
-		switch (action)
+		
+		switch(action)
 		{
-		case 1:
-			mm_MemberManagement(member_manager_selector);
-			break;
-		case 2:
-			tm_trainerManagementMenu();
-			break;
+			case 1:
+				mm_MemberManagement(&member_manager);
+				break;
+			case 2:
+				tm_trainerManagementMenu(&trainer_manager);
+				break;
+			case 3:
+//				SaveData();
+				break;
+			case 0:
+				break;
+			default:
+				Noti("Invalid action!");
 		}
-
-	} while (running && action != 0);
+		
+	}while(running && action!=0);		
 }
+

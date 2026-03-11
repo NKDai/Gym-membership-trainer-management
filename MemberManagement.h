@@ -1,7 +1,10 @@
 #ifndef MEMBERMANAGEMENT_H
 #define MEMBERMANAGEMENT_H
 #include "member.h"
-#define MEMBERS_FILE "members.dat"
+
+#define MAX_MEMBERS 999
+#define MEMBER_SAVE_FILE_NAME "members.dat"
+
 // ---------------------------------------------------------------------------------------------------------------------- STRUCT
 
 typedef struct
@@ -18,11 +21,8 @@ void mm_AddMember(MemberManager *mb_manager, Member member_info);
 void mm_RemoveMember(MemberManager *mb_manager, int member_index);
 // Use to remove member from a MemberManager directly by the index of that member
 
-void mm_SaveMembersToFile(MemberManager *mb_manager);
-// Save members to file
-
-int mm_LoadMembersFromFile(MemberManager *mb_manager);
-// Load members from file
+void mm_DisplayAllMembers(MemberManager *mb_manager);
+// Display all members as a grid board
 
 void mm_SearchMemberByID(MemberManager *mb_manager, char *id, Member **selector);
 // Use to search a member by input an ID
@@ -97,7 +97,7 @@ int mm_InputBirthYear(char *msg);
 // *msg is use to show guide
 // Main function of MemberManagement
 // This function show Menu and give user action to use other sub-function about member management.
-void mm_MemberManagement(MemberManager *mb_manager);
+
 int mm_GetMemberIndex(MemberManager *mb_manager, char id[]);
 // Return member index in member list by using ID to find
 
@@ -114,5 +114,18 @@ void mm_MemberManagement_MakeSureMenu();
 void mm_MemberManagement_InfoListMenu();
 // The menu that show options in ChangingMemberInfo
 // [1] change fullname, [2] change membership type, [0] quit
+
+
+// ---------------------------------------------------------------------------------------------------------------------- DATA WORKING
+void mm_LoadData(MemberManager *mb_manager);
+// Get data from file and write it to mb_manager
+
+void mm_SaveData(MemberManager *mb_manager);
+// Write data to file from mb_manager's data
+
+// ----------------------------------------------------------------------- MAIN
+
+void mm_MemberManagement(MemberManager *mb_manager);
+// Main controll member management's functions
 
 #endif
