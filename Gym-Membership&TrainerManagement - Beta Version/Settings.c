@@ -173,6 +173,7 @@ void st_Settings_Menu(Settings *settings)
     printf("--------------------------------\n");
     printf("[4] Default Settings\n");
     printf("[5] Delete All Data\n");
+    printf("--------------------------------\n");
     printf("[0] Save and Back\n");
     printf("--------------------------------\n");
 }

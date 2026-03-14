@@ -27,7 +27,7 @@ void mm_RemoveMember(MemberManager *mb_manager, int Member_index);
 void mm_DisplayAllMembers(MemberManager *mb_manager);
 // Display all Members as a grid board
 
-void mm_SearchMemberByID(MemberManager *mb_manager, char id[], Member *selector);
+Member* mm_SearchMemberByID(MemberManager *mb_manager, char id[]);
 // Use to search a Member by input an ID
 
 void mm_SearchMemberByName(MemberManager *mb_manager, char *name, MemberManager *selectors);
