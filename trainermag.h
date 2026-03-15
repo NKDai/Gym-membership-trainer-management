@@ -24,7 +24,7 @@ struct Trainer
 };
 
 // Trainer Manager struct
-typedef struct
+typedef struct TrainerManager
 {
     int count;
     int capacity;
@@ -39,7 +39,7 @@ void tm_searchTrainerByName(TrainerManager *tm_manager);          // Search trai
 void tm_editTrainer(TrainerManager *tm_manager);                  // Edit trainer information
 void tm_deleteTrainer(TrainerManager *tm_manager);                // Delete a trainer
 void tm_displayMenu();                                            // Display trainer management menu
-void tm_trainerManagementMenu(TrainerManager *tm_manager);        // Main menu loop for trainer management
+void tm_trainerManagementMenu(TrainerManager *tm_manager, struct Settings *settings);        // Main menu loop for trainer management
 void tm_assignMemberToTrainer(TrainerManager *tm_manager);        // Assign a member to a trainer
 void tm_removeMemberFromTrainer(TrainerManager *tm_manager);      // Remove a member from a trainer
 void tm_displayTrainerMembers(TrainerManager *tm_manager);        // Display members assigned to a trainer

@@ -4,11 +4,11 @@
 #include <ctype.h>
 #include <time.h>
 
-#include "MemberManagement.h"
-#include "member.h"
+#include "member.h"           
+#include "Settings.h"        
+#include "MemberManagement.h" 
 #include "GlobalFunctions.h"
-
-
+	
 int mm_InputMembershipType(char *msg)
 {
 	int membership_type=-9;
@@ -59,7 +59,8 @@ void mm_InputMemberID(char *msg, char *id)
 }
 
 
-void mm_AddMember(MemberManager *mb_manager, Member member_info){
+void mm_AddMember(MemberManager *mb_manager, Member member_info)
+{
 	
 	int new_count = mb_manager->count+1;
 	Member* new_members = realloc(mb_manager->members, new_count*sizeof(Member));
@@ -81,29 +82,32 @@ void mm_DisplayAllMembers(MemberManager *mb_manager)
            "No.", "Full-name", "ID", "Membership type", "Trainer ID", "Birth year","Registration date");
     printf("|----------------------------------------------------------------------------------------------------------------|\n");
     
-    if(mb_manager->count==0 || mb_manager->members==NULL)
+    
+    if(mb_manager==NULL || mb_manager->members==NULL || mb_manager->count==0)
     {
     	printf("|                                            No member here...                                                   | \n");
     	printf("|________________________________________________________________________________________________________________| \n");
     	return;
 	}
     
+        
     for (int i = 0; i < mb_manager->count; i++)
     {
-        Member *current_member = &mb_manager->members[i];
+        Member current_member = mb_manager->members[i];
         
-        char *registration_date;
-        mb_StringDate(current_member->registration_date, &registration_date);
+        char registration_date[11];
+        mb_StringDate(current_member.registration_date, registration_date);
 
         printf("| %-3d | %-24s | %-7s | %-17s | %-12s | %-12d | %-17s |\n",
                i+1,
-               current_member->name,
-               current_member->id,
-               membership_types[current_member->membership_type],
-               current_member->trainer_id,
-               current_member->birth_year,
+               current_member.name,
+               current_member.id,
+               membership_types[current_member.membership_type],
+               current_member.trainer_id,
+               current_member.birth_year,
 			   registration_date);
     }
+
     printf("|________________________________________________________________________________________________________________| \n");
 }
 
@@ -223,20 +227,19 @@ void mm_MemberManagement_SearchingMemberByID(MemberManager *mb_manager)
 	Clear();
 	
 	char id[7];
-	Member *selector;
 	
 	printf("SEARCHING MEMBER MODE\n");
 	printf("------------------------------\n");
 	mm_InputMemberID("Enter member ID", id);
 	printf("---------------------------\n");
 	
-	mm_SearchMemberByID(mb_manager, id, &selector);
+	Member* member = mm_SearchMemberByID(mb_manager, id);
 	
-	if(selector!=NULL)
+	if(member!=NULL)
 	{
 		printf("MEMBER INFORMATION\n");
 		printf("---------------------------\n");
-		mb_PrintMemberInfo(selector);
+		mb_PrintMemberInfo(member);
 		printf("---------------------------\n");
 		Pause();
 	}
@@ -246,19 +249,16 @@ void mm_MemberManagement_SearchingMemberByID(MemberManager *mb_manager)
 	}
 }
 
-void mm_SearchMemberByID(MemberManager *mb_manager, char id[], Member **selector)
+Member* mm_SearchMemberByID(MemberManager *mb_manager, char id[])
 {
-	
-	int running=1;
-	for(int i=0; i<mb_manager->count && running; i++)
+	for(int i=0; i<mb_manager->count; i++)
 	{
 		if(strcmp(mb_manager->members[i].id, id)==0)
 		{
-			*selector = &mb_manager->members[i];
-			running = 0;
+			return &mb_manager->members[i];
 		}
 	}
-	if(running==1) *selector = NULL;
+	return NULL;
 }
 
 void mm_SearchMemberByName(MemberManager *mb_manager, char *name, MemberManager *selectors)
@@ -358,8 +358,6 @@ void mm_MemberManagement_RemovingMember(MemberManager *mb_manager)
 {
 	int action;
 	char id[7];
-	Member *selector;
-	
 	
 	Clear();
 	printf("REMOVING MEMBER MODE\n");
@@ -368,7 +366,7 @@ void mm_MemberManagement_RemovingMember(MemberManager *mb_manager)
 	scanf("%s", id);
 	
 	
-	mm_SearchMemberByID(mb_manager, id, &selector);
+	Member *selector = mm_SearchMemberByID(mb_manager, id);
 	if(selector!= NULL)
 	{
 		
@@ -413,6 +411,7 @@ void mm_MemberManagement_ChangingMemberInfo(MemberManager *mb_manager) // name/m
 	char new_name[255];
 	int new_membership_type;
 	Member *selector;
+	
 	do
 	{
 		action = -1;
@@ -428,7 +427,7 @@ void mm_MemberManagement_ChangingMemberInfo(MemberManager *mb_manager) // name/m
 		{
 			case 1:	
 				mm_InputMemberID("Enter member ID", id);
-				mm_SearchMemberByID(mb_manager, id, &selector);
+				selector = mm_SearchMemberByID(mb_manager, id);
 				if(selector!=NULL)
 				{
 					printf("Current name : %s\n", selector->name);
@@ -446,7 +445,7 @@ void mm_MemberManagement_ChangingMemberInfo(MemberManager *mb_manager) // name/m
 				break;
 			case 2:
 				mm_InputMemberID("Enter member ID", id);
-				mm_SearchMemberByID(mb_manager, id, &selector);
+				selector = mm_SearchMemberByID(mb_manager, id);
 				if(selector!=NULL)
 				{
 					printf("Member fullname : %s\n", selector->name);
@@ -490,7 +489,7 @@ void mm_SaveData(MemberManager *mb_manager)
 	fclose(f);
 }
 
-void mm_MemberManagement(MemberManager *mb_manager)
+void mm_MemberManagement(MemberManager *mb_manager, struct Settings *settings)
 {
     int running = 1;
     int action;
@@ -509,11 +508,17 @@ void mm_MemberManagement(MemberManager *mb_manager)
                 break;
             case 2:
                 mm_MemberManagement_AddingMember(mb_manager);
-                mm_SaveData(mb_manager);
+                if(settings->current_auto_save_mode)
+                {
+                	mm_SaveData(mb_manager);
+				}
                 break;
             case 3:
                 mm_MemberManagement_RemovingMember(mb_manager);
-                mm_SaveData(mb_manager);
+                if(settings->current_auto_save_mode)
+                {
+                	mm_SaveData(mb_manager);
+				}
                 break;
             case 4:
                 mm_MemberManagement_SearchingMemberByID(mb_manager);
@@ -523,7 +528,10 @@ void mm_MemberManagement(MemberManager *mb_manager)
             	break;
             case 6:
             	mm_MemberManagement_ChangingMemberInfo(mb_manager);
-            	mm_SaveData(mb_manager);
+            	if(settings->current_auto_save_mode)
+                {
+                	mm_SaveData(mb_manager);
+				}
             	break;
             case 0:
             	running=0;
@@ -535,5 +543,8 @@ void mm_MemberManagement(MemberManager *mb_manager)
 
     } while(running && action != 0);
     
-    mm_SaveData(mb_manager);
+    if(settings->current_auto_save_mode)
+    {
+    	mm_SaveData(mb_manager);
+	}
 }

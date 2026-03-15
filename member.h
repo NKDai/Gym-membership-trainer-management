@@ -23,12 +23,21 @@ typedef struct // MEMBER INFORMATION
 	
 	int removed;
 	
+	long registration_date_value;
+	
 	Date registration_date;
 
 }Member;
 
 extern int number_of_membership_types;
 extern char *membership_types[];
+
+// --------------------------------------------------------------------
+int mb_IsAssigned(Member *member);
+// Use to check if a member assigned any trainer or not
+
+int mb_IsAssignedBy(Member *member, char *trainer_id);
+// Use to check if a member assigned the trainer has this trainer_id or not
 
 // --------------------------------------------------------------------
 void mb_SetName(Member *member, char name[]);
@@ -43,6 +52,9 @@ void mb_SetMembershipType(Member *member, int membership_type);
 void mb_SetTrainerID(Member *member, char trainer_id[]);
 // Set member.trainer_id = trainer_id using strcmp
 
+void mb_RemoveTrainer(Member *member);
+// Use to set trainer_id of a member back to NULL
+
 void mb_SetRegistrationDate(Member *member);
 // Set member.registration_date = today using <time.h>
 
@@ -50,8 +62,12 @@ void mb_SetBirthYear(Member *member, int birth_year);
 // Set member.birth_year = birth_year
 
 // --------------------------------------------------------------------
-void mb_StringDate(Date date, char **string_date);
+void mb_StringDate(Date date, char string_date[]);
 // Transform from struct Date to a string as "dd/mm/yyyy" and write it to **string_date
+
+long mb_TodayToValue();
+// return an int of registration date value for sorting and comparing
+// Use when created a new member
 
 void mb_PrintMemberInfo(Member *member);
 // Print information about a member as a list information

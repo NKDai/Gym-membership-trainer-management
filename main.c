@@ -3,38 +3,19 @@
 #include <time.h>
 #include <string.h>
 
+#include "Settings.h"
+#include "GlobalFunctions.h"
+
 #include "member.h"
 #include "MemberManagement.h"
 
 #include "trainermag.h"
 
-#include "GlobalFunctions.h"
-#include "Settings.h"
-
-
-void SortMenu(MemberManager* mb_manager, Settings *settings)
-{
-	int action;
-	do
-	{
-		Clear();
-		printf("SORT MODE\n");
-		printf("[1] Sort member by birth year\n");
-		printf("[2] Sort member by registration date\n");
-		action = InputIntValue("Enter your action: ");
-		switch(action)
-		{
-			case 1:
-				break;
-			case 2:
-				break;
-		}
-	
-	}while(action!=0);
-}
+#include "Sort.h"
 
 void Menu()
 {
+	printf(" --------------- GYM MANAGEMENT ---------------\n");
 	printf("[1] Member Management                        \n");
 	printf("[2] Trainer Management                       \n");
 	printf("[3] Sort                                     \n");
@@ -42,11 +23,20 @@ void Menu()
 	printf("-----------------------------------------------\n");
 	printf("[9] Settings                                 \n");
 	printf("[0] Quit                                     \n");
+	printf(" ----------------------------------------------\n");
 }
+
+void SaveData(TrainerManager *trainer_manager, MemberManager *member_manager)
+{
+	tm_saveTrainersToFile(trainer_manager);
+	mm_SaveData(member_manager);
+}
+
 int main()
 {	
 	Settings settings;
-//	st_LoadSettings(&settings);
+	st_SetSettings(&settings);
+	
 
 	MemberManager member_manager = {0, NULL};
 	TrainerManager trainer_manager = {0, 0, NULL};
@@ -60,28 +50,41 @@ int main()
 	do
 	{
 		Clear();
-		printf(" --------------- GYM MANAGEMENT ---------------\n");
 		Menu();
-		printf(" ----------------------------------------------\n");
 		action = InputIntValue("Enter your choice");
 		
 		switch(action)
 		{
 			case 1:
-				mm_MemberManagement(&member_manager);
+				mm_MemberManagement(&member_manager, &settings);
 				break;
 			case 2:
-				tm_trainerManagementMenu(&trainer_manager);
+				tm_trainerManagementMenu(&trainer_manager, &settings);
 				break;
 			case 3:
-//				SaveData();
+				s_SortManagement(&member_manager, &settings);
+				break;
+			case 4:
+				SaveData(&trainer_manager, &member_manager);
+				Noti("Data saved successfully!");
+				break;
+			case 9:
+				st_Settings_Management(&settings, &member_manager, &trainer_manager);
+				SaveData(&trainer_manager, &member_manager);
 				break;
 			case 0:
+				printf("Quitting...");
+				running = 0;
 				break;
 			default:
 				Noti("Invalid action!");
 		}
 		
-	}while(running && action!=0);		
+	}while(running);		
+	
+	if(settings.current_auto_save_mode)
+	{
+		SaveData(&trainer_manager, &member_manager);
+	}
 }
 
