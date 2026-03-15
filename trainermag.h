@@ -32,6 +32,8 @@ typedef struct TrainerManager
 } TrainerManager;
 
 // Function declarations
+struct Settings;
+
 void tm_addTrainer(TrainerManager *tm_manager);                   // Add a new trainer
 void tm_displayAllTrainers(TrainerManager *tm_manager);           // Display all trainers
 void tm_searchTrainerById(TrainerManager *tm_manager);            // Search trainer by ID
