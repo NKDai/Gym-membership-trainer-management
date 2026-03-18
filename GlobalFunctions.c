@@ -59,3 +59,9 @@ int InputIntValue(char *msg)
 
     return 999;
 }
+
+void ClearInputBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}

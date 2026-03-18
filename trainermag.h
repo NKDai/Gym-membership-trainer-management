@@ -4,11 +4,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define INITIAL_TRAINERS 10
 #define MAX_TRAINERS 999
 #define MAX_NAME 50
 #define MAX_SPEC 50
 #define MAX_MEMBERS_PER_TRAINER 50
 #define TRAINERS_FILE "trainers.dat"
+
+#include "MemberManagement.h"
 
 struct Trainer
 {
@@ -22,24 +25,30 @@ struct Trainer
     int memberCount;
 };
 
-// Function declarations
-void addTrainer();                                             // Add a new trainer
-void displayAllTrainers();                                     // Display all trainers
-void searchTrainerById();                                      // Search trainer by ID
-void searchTrainerByName();                                    // Search trainer by name
-void editTrainer();                                            // Edit trainer information
-void deleteTrainer();                                          // Delete a trainer
-void displayMenu();                                            // Display trainer management menu
-void trainerManagementMenu();                                  // Main menu loop for trainer management
-void assignMemberToTrainer();                                  // Assign a member to a trainer
-void removeMemberFromTrainer();                                // Remove a member from a trainer
-void displayTrainerMembers();                                  // Display members assigned to a trainer
-void saveTrainersToFile(struct Trainer trainers[], int count); // Save trainers to file
-int loadTrainersFromFile(struct Trainer trainers[]);           // Load trainers from file
-void sortTrainersByName(struct Trainer trainers[], int count); // Sort trainers by name
+// Trainer Manager struct
+typedef struct TrainerManager
+{
+    int count;
+    int capacity;
+    struct Trainer *trainers;
+} TrainerManager;
 
-// Globals (defined in trainer.c)
-extern struct Trainer trainers[MAX_TRAINERS];
-extern int trainerCount;
+// Function declarations
+struct Settings;
+
+void tm_addTrainer(TrainerManager *tm_manager);                   // Add a new trainer
+void tm_displayAllTrainers(TrainerManager *tm_manager);           // Display all trainers
+void tm_searchTrainerById(TrainerManager *tm_manager);            // Search trainer by ID
+void tm_searchTrainerByName(TrainerManager *tm_manager);          // Search trainer by name
+void tm_editTrainer(TrainerManager *tm_manager);                  // Edit trainer information
+void tm_deleteTrainer(TrainerManager *tm_manager);                // Delete a trainer
+void tm_displayMenu();                                            // Display trainer management menu
+void tm_trainerManagementMenu(TrainerManager *tm_manager, struct Settings *settings, MemberManager *mb_manager);        // Main menu loop for trainer management
+void tm_assignMemberToTrainer(TrainerManager *tm_manager, MemberManager *mb_manager);        // Assign a member to a trainer
+void tm_removeMemberFromTrainer(TrainerManager *tm_manager);      // Remove a member from a trainer
+void tm_displayTrainerMembers(TrainerManager *tm_manager);        // Display members assigned to a trainer
+void tm_saveTrainersToFile(TrainerManager *tm_manager);           // Save trainers to file
+int tm_loadTrainersFromFile(TrainerManager *tm_manager);          // Load trainers from file
+void tm_sortTrainersByName(struct Trainer trainers[], int count); // Sort trainers by name
 
 #endif
