@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include "trainermag.h"
 #include "GlobalFunctions.h" // for clearInputBuffer, Pause, etc.
+#include "Settings.h"
+
+#include "member.h"
+#include "MemberManagement.h"
 
 // Helper function to resize trainers array
 static void resizeTrainers(TrainerManager *tm_manager, int newCapacity)
@@ -116,7 +120,6 @@ void tm_addTrainer(TrainerManager *tm_manager)
     tm_manager->trainers[slot] = newTrainer;
     tm_manager->count++;
     printf("\n[OK] SUCCESSFULLY ADDED TRAINER (ID: %s)\n", newTrainer.id);
-    tm_saveTrainersToFile(tm_manager);
 }
 
 void tm_displayAllTrainers(TrainerManager *tm_manager)
@@ -265,7 +268,6 @@ void tm_editTrainer(TrainerManager *tm_manager)
             }
 
             printf("\n[OK] Trainer information updated successfully!\n");
-            tm_saveTrainersToFile(tm_manager);
             return;
         }
     }
@@ -306,7 +308,6 @@ void tm_deleteTrainer(TrainerManager *tm_manager)
                     tm_manager->trainers[i].memberCount = 0;
                     tm_manager->count--;
                     printf("[OK] Trainer deleted successfully!\n");
-                    tm_saveTrainersToFile(tm_manager);
                 }
                 else
                 {
@@ -324,7 +325,7 @@ void tm_saveTrainersToFile(TrainerManager *tm_manager)
     FILE *file = fopen(TRAINERS_FILE, "wb");
     if (file == NULL)
     {
-        printf("!!! ERROR: Cannot open file for saving data! !!!\n");
+        Noti("!!! ERROR: Cannot open file for saving data! !!!");
         return;
     }
 
@@ -344,7 +345,6 @@ void tm_saveTrainersToFile(TrainerManager *tm_manager)
         }
     }
     fclose(file);
-    printf("[OK] DATA SAVED SUCCESSFULLY!\n");
 }
 
 int tm_loadTrainersFromFile(TrainerManager *tm_manager)
@@ -376,9 +376,6 @@ void tm_displayTrainerMembers(TrainerManager *tm_manager)
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
     }
-
-    // clear newline left by menu input
-    clearInputBuffer();
 
     char searchId[10];
     printf("\nENTER TRAINER ID TO VIEW MEMBER LIST (e.g., TRN001): ");
@@ -412,16 +409,18 @@ void tm_displayTrainerMembers(TrainerManager *tm_manager)
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", searchId);
 }
 
-void tm_assignMemberToTrainer(TrainerManager *tm_manager)
+void tm_assignMemberToTrainer(TrainerManager *tm_manager, MemberManager *mb_manager)
 {
     if (tm_manager->count == 0)
     {
-        printf("\n*** NO TRAINERS IN SYSTEM ***\n");
+        Noti("*** NO TRAINERS TO ASSGIN ***");
         return;
     }
-
-    // clear newline from previous menu choice
-    clearInputBuffer();
+    if(mb_manager->count <= 0)
+    {
+    	Noti("*** NO MEMBER TO ASSIGN ***");
+    	return;
+	}
 
     char trainerId[10];
     printf("\nENTER TRAINER ID TO ASSIGN MEMBER (e.g., TRN001): ");
@@ -459,7 +458,6 @@ void tm_assignMemberToTrainer(TrainerManager *tm_manager)
             strcpy(tm_manager->trainers[i].memberIds[tm_manager->trainers[i].memberCount], memberId);
             tm_manager->trainers[i].memberCount++;
             printf("\n[OK] Member '%s' assigned to trainer '%s' successfully!\n", memberId, tm_manager->trainers[i].name);
-            tm_saveTrainersToFile(tm_manager);
             return;
         }
     }
@@ -473,9 +471,6 @@ void tm_removeMemberFromTrainer(TrainerManager *tm_manager)
         printf("\n*** NO TRAINERS IN SYSTEM ***\n");
         return;
     }
-
-    // flush newline left by menu
-    clearInputBuffer();
 
     char trainerId[10];
     printf("\nENTER TRAINER ID TO REMOVE MEMBER (e.g., TRN001): ");
@@ -516,7 +511,6 @@ void tm_removeMemberFromTrainer(TrainerManager *tm_manager)
                     }
                     tm_manager->trainers[i].memberCount--;
                     printf("\n[OK] Member '%s' removed from trainer '%s' successfully!\n", memberId, tm_manager->trainers[i].name);
-                    tm_saveTrainersToFile(tm_manager);
                     return;
                 }
             }
@@ -564,7 +558,7 @@ void tm_displayMenu()
     printf("OPTION: ");
 }
 
-void tm_trainerManagementMenu(TrainerManager *tm_manager)
+void tm_trainerManagementMenu(TrainerManager *tm_manager, struct Settings *settings, MemberManager *mb_manager)
 {
     int choice;
 
@@ -574,7 +568,7 @@ void tm_trainerManagementMenu(TrainerManager *tm_manager)
         tm_displayMenu();
         
         choice = InputIntValue("Enter your choice");
-        clearInputBuffer();
+        ClearInputBuffer();
 
         Clear(); // Clear screen after selecting option
 
@@ -582,6 +576,7 @@ void tm_trainerManagementMenu(TrainerManager *tm_manager)
         {
         case 1:
             tm_addTrainer(tm_manager);
+            if (settings->current_auto_save_mode) tm_saveTrainersToFile(tm_manager);
             Pause();
             break;
         case 2:
@@ -598,10 +593,12 @@ void tm_trainerManagementMenu(TrainerManager *tm_manager)
             break;
         case 5:
             tm_editTrainer(tm_manager);
+            if (settings->current_auto_save_mode) tm_saveTrainersToFile(tm_manager);
             Pause();
             break;
         case 6:
             tm_deleteTrainer(tm_manager);
+            if (settings->current_auto_save_mode) tm_saveTrainersToFile(tm_manager);
             Pause();
             break;
         case 7:
@@ -613,19 +610,20 @@ void tm_trainerManagementMenu(TrainerManager *tm_manager)
             Pause();
             break;
         case 9:
-            tm_assignMemberToTrainer(tm_manager);
+            tm_assignMemberToTrainer(tm_manager, mb_manager);
+            if (settings->current_auto_save_mode) tm_saveTrainersToFile(tm_manager);
             Pause();
             break;
         case 10:
             tm_removeMemberFromTrainer(tm_manager);
+            if (settings->current_auto_save_mode) tm_saveTrainersToFile(tm_manager);
             Pause();
             break;
         case 0:
-            printf("\n[OK] RETURN TO MAIN MENU!\n");
-            return; // Return to main menu
+            printf("[OK] RETURN TO MAIN MENU!");
+            return;
         default:
-            printf("!!! INVALID OPTION !!!\n");
-            Pause();
+            Noti("!!! INVALID OPTION !!!");
         }
     }
 }
