@@ -20,4 +20,6 @@ int InputIntValue(char *msg);
 
 int IsInteger(char *input);
 // use to check if a string input is a integer or not
+
+void ClearInputBuffer();
 #endif
