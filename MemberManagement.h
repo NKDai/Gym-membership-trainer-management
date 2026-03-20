@@ -18,10 +18,10 @@ typedef struct MemberManager{
 }MemberManager;
 
 // ---------------------------------------------------------------------------------------------------------------------- CORE FUNCTIONS
-void mm_AddMember(MemberManager *mb_manager,  Member Member_info);
+int mm_AddMember(MemberManager *mb_manager,  Member Member_info);
 // Use to add Member into a MemberManager directly from a copy of Member_info
 
-void mm_RemoveMember(MemberManager *mb_manager, int Member_index);
+int mm_RemoveMember(MemberManager *mb_manager, int Member_index);
 // Use to remove Member from a MemberManager directly by the index of that Member
 
 void mm_DisplayAllMembers(MemberManager *mb_manager);

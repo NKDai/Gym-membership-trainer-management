@@ -3,17 +3,29 @@
 #include "GlobalFunctions.h" // for clearInputBuffer, Pause, etc.
 #include "Settings.h"
 
+#include "member.h"
+#include "MemberManagement.h"
+
 // Helper function to resize trainers array
 static void resizeTrainers(TrainerManager *tm_manager, int newCapacity)
 {
     if (newCapacity > MAX_TRAINERS)
         newCapacity = MAX_TRAINERS;
+    
+    int oldCapacity = tm_manager->capacity;
+    
     tm_manager->trainers = realloc(tm_manager->trainers, newCapacity * sizeof(struct Trainer));
     if (tm_manager->trainers == NULL)
     {
         printf("!!! MEMORY ALLOCATION FAILED !!!\n");
         exit(1);
     }
+    
+    // Zero out newly allocated space
+    if (newCapacity > oldCapacity) {
+        memset(tm_manager->trainers + oldCapacity, 0, (newCapacity - oldCapacity) * sizeof(struct Trainer));
+    }
+    
     tm_manager->capacity = newCapacity;
 }
 
@@ -103,7 +115,7 @@ void tm_addTrainer(TrainerManager *tm_manager)
 
     // find slot to insert (reuse empty if possible)
     int slot = -1;
-    for (int i = 0; i < MAX_TRAINERS; i++)
+    for (int i = 0; i < tm_manager->capacity; i++)
     {
         if (tm_manager->trainers[i].id[0] == '\0')
         {
@@ -127,21 +139,26 @@ void tm_displayAllTrainers(TrainerManager *tm_manager)
         return;
     }
 
-    printf("\n============================================ ALL TRAINERS LIST ============================================\n");
-    printf("%-8s %-20s %-20s %-15s\n", "ID", "Name", "Specialty", "Salary (VND)");
-    printf("==========================================================================================================\n");
+    printf("\n================================================================= ALL TRAINERS LIST =================================================================\n");
+    printf("%-8s %-20s %-20s %-8s %-15s %-15s\n", "ID", "Name", "Specialty", "Members", "Base Sal.(VND)", "Total Sal.(VND)");
+    printf("=====================================================================================================================================================\n");
 
     for (int i = 0; i < tm_manager->capacity; i++)
     {
         if (tm_manager->trainers[i].id[0] == '\0')
             continue;
-        printf("%-8s %-20s %-20s %-15.0f\n",
+        
+        float total_salary = tm_manager->trainers[i].salary * tm_manager->trainers[i].memberCount;
+        
+        printf("%-8s %-20s %-20s %-8d %-15.0f %-15.0f\n",
                tm_manager->trainers[i].id,
                tm_manager->trainers[i].name,
                tm_manager->trainers[i].specialty,
-               tm_manager->trainers[i].salary);
+               tm_manager->trainers[i].memberCount,
+               tm_manager->trainers[i].salary,
+               total_salary);
     }
-    printf("==========================================================================================================\n");
+    printf("=====================================================================================================================================================\n");
 }
 
 void tm_searchTrainerById(TrainerManager *tm_manager)
@@ -167,7 +184,9 @@ void tm_searchTrainerById(TrainerManager *tm_manager)
             printf("ID: %s\n", tm_manager->trainers[i].id);
             printf("Name: %s\n", tm_manager->trainers[i].name);
             printf("Specialty: %s\n", tm_manager->trainers[i].specialty);
-            printf("Salary: %.0f VND\n", tm_manager->trainers[i].salary);
+            printf("Members Count: %d\n", tm_manager->trainers[i].memberCount);
+            printf("Base Salary: %.0f VND\n", tm_manager->trainers[i].salary);
+            printf("Total Salary: %.0f VND\n", tm_manager->trainers[i].salary * tm_manager->trainers[i].memberCount);
             printf("===================================\n");
             return;
         }
@@ -189,9 +208,9 @@ void tm_searchTrainerByName(TrainerManager *tm_manager)
     searchName[strcspn(searchName, "\n")] = 0;
 
     int found = 0;
-    printf("\n========== SEARCH RESULTS ==========\n");
-    printf("%-8s %-20s %-20s %-15s\n", "ID", "Name", "Specialty", "Salary (VND)");
-    printf("======================================================================================================\n");
+    printf("\n================================================================== SEARCH RESULTS ===================================================================\n");
+    printf("%-8s %-20s %-20s %-8s %-15s %-15s\n", "ID", "Name", "Specialty", "Members", "Base Sal.(VND)", "Total Sal.(VND)");
+    printf("=====================================================================================================================================================\n");
 
     for (int i = 0; i < tm_manager->capacity; i++)
     {
@@ -199,11 +218,14 @@ void tm_searchTrainerByName(TrainerManager *tm_manager)
             continue;
         if (strstr(tm_manager->trainers[i].name, searchName) != NULL)
         {
-            printf("%-8s %-20s %-20s %-15.0f\n",
+            float total_salary = tm_manager->trainers[i].salary * tm_manager->trainers[i].memberCount;
+            printf("%-8s %-20s %-20s %-8d %-15.0f %-15.0f\n",
                    tm_manager->trainers[i].id,
                    tm_manager->trainers[i].name,
                    tm_manager->trainers[i].specialty,
-                   tm_manager->trainers[i].salary);
+                   tm_manager->trainers[i].memberCount,
+                   tm_manager->trainers[i].salary,
+                   total_salary);
             found = 1;
         }
     }
@@ -212,7 +234,7 @@ void tm_searchTrainerByName(TrainerManager *tm_manager)
     {
         printf("!!! NO TRAINER FOUND WITH NAME: %s !!!\n", searchName);
     }
-    printf("======================================================================================================\n");
+    printf("=====================================================================================================================================================\n");
 }
 
 void tm_editTrainer(TrainerManager *tm_manager)
@@ -366,7 +388,7 @@ int tm_loadTrainersFromFile(TrainerManager *tm_manager)
     return count;
 }
 
-void tm_displayTrainerMembers(TrainerManager *tm_manager)
+void tm_displayTrainerMembers(TrainerManager *tm_manager, MemberManager *mb_manager)
 {
     if (tm_manager->count == 0)
     {
@@ -396,7 +418,13 @@ void tm_displayTrainerMembers(TrainerManager *tm_manager)
                 printf("\nAssigned members:\n");
                 for (int j = 0; j < tm_manager->trainers[i].memberCount; j++)
                 {
-                    printf("%d. %s\n", j + 1, tm_manager->trainers[i].memberIds[j]);
+                    Member *member = mm_SearchMemberByID(mb_manager, tm_manager->trainers[i].memberIds[j]);
+                    if (member != NULL) {
+                        printf("\n--- Member %d ---\n", j + 1);
+                        mb_PrintMemberInfo(member);
+                    } else {
+                        printf("\n%d. %s (Data not found)\n", j + 1, tm_manager->trainers[i].memberIds[j]);
+                    }
                 }
             }
             printf("===============================================\n");
@@ -406,13 +434,18 @@ void tm_displayTrainerMembers(TrainerManager *tm_manager)
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", searchId);
 }
 
-void tm_assignMemberToTrainer(TrainerManager *tm_manager)
+void tm_assignMemberToTrainer(TrainerManager *tm_manager, MemberManager *mb_manager)
 {
     if (tm_manager->count == 0)
     {
         Noti("*** NO TRAINERS TO ASSGIN ***");
         return;
     }
+    if(mb_manager->count <= 0)
+    {
+    	Noti("*** NO MEMBER TO ASSIGN ***");
+    	return;
+	}
 
     char trainerId[10];
     printf("\nENTER TRAINER ID TO ASSIGN MEMBER (e.g., TRN001): ");
@@ -436,17 +469,22 @@ void tm_assignMemberToTrainer(TrainerManager *tm_manager)
             fgets(memberId, 10, stdin);
             memberId[strcspn(memberId, "\n")] = 0;
 
-            // Check if member already assigned
-            for (int j = 0; j < tm_manager->trainers[i].memberCount; j++)
+            Member *member = mm_SearchMemberByID(mb_manager, memberId);
+            if (member == NULL)
             {
-                if (strcmp(tm_manager->trainers[i].memberIds[j], memberId) == 0)
-                {
-                    printf("\n!!! Member '%s' already assigned to this trainer! !!!\n", memberId);
-                    return;
-                }
+                printf("\n!!! NO MEMBER FOUND WITH ID: %s !!!\n", memberId);
+                return;
+            }
+
+            // Check if member already assigned
+            if (mb_IsAssignedBy(member, tm_manager->trainers[i].id))
+            {
+                printf("\n!!! Member '%s' already assigned to this trainer! !!!\n", memberId);
+                return;
             }
 
             // Add member
+            mb_SetTrainerID(member, tm_manager->trainers[i].id);
             strcpy(tm_manager->trainers[i].memberIds[tm_manager->trainers[i].memberCount], memberId);
             tm_manager->trainers[i].memberCount++;
             printf("\n[OK] Member '%s' assigned to trainer '%s' successfully!\n", memberId, tm_manager->trainers[i].name);
@@ -456,7 +494,7 @@ void tm_assignMemberToTrainer(TrainerManager *tm_manager)
     printf("\n!!! NO TRAINER FOUND WITH ID: %s !!!\n", trainerId);
 }
 
-void tm_removeMemberFromTrainer(TrainerManager *tm_manager)
+void tm_removeMemberFromTrainer(TrainerManager *tm_manager, MemberManager *mb_manager)
 {
     if (tm_manager->count == 0)
     {
@@ -502,6 +540,12 @@ void tm_removeMemberFromTrainer(TrainerManager *tm_manager)
                         strcpy(tm_manager->trainers[i].memberIds[k], tm_manager->trainers[i].memberIds[k + 1]);
                     }
                     tm_manager->trainers[i].memberCount--;
+                    
+                    Member *member = mm_SearchMemberByID(mb_manager, memberId);
+                    if (member != NULL) {
+                        mb_RemoveTrainer(member);
+                    }
+                    
                     printf("\n[OK] Member '%s' removed from trainer '%s' successfully!\n", memberId, tm_manager->trainers[i].name);
                     return;
                 }
@@ -532,25 +576,26 @@ void tm_sortTrainersByName(struct Trainer trainers[], int count)
 
 void tm_displayMenu()
 {
-    printf("\n");
-    printf("========== TRAINER MANAGEMENT =========\n");
-    printf("1. ADD NEW TRAINER\n");
-    printf("2. DISPLAY ALL TRAINERS\n");
-    printf("3. SEARCH TRAINER BY ID\n");
-    printf("4. SEARCH TRAINER BY NAME\n");
-    printf("5. EDIT TRAINER INFO\n");
-    printf("6. DELETE TRAINER\n");
-    printf("7. SORT TRAINERS BY NAME\n");
-    printf("\n--- MANAGEMENT MEMBER OF TRAINER ---\n");
-    printf("8. VIEW TRAINER MEMBERS\n");
-    printf("9. ASSIGN MEMBER TO TRAINER\n");
-    printf("10. REMOVE MEMBER FROM TRAINER\n");
-    printf("0. RETURN TO MAIN MENU\n");
-    printf("================================\n");
-    printf("OPTION: ");
+	printf("------------- TRAINER MANAGEMENT -------------- \n");
+	printf("[1] Add new trainer \n");
+	printf("[2] Display all trainers \n");
+	printf("[3] Search trainer by ID \n");
+	printf("[4] Search trainer by name \n");
+	printf("[5] Edit trainer info \n");
+	printf("[6] Delete trainer \n");
+	printf("----------------------------------------------- \n");
+	printf("[7] Sort trainers by name \n");
+	printf("----------------------------------------------- \n");
+	printf("--------- MANAGEMENT MEMBER OF TRAINER -------- \n");
+	printf("[8] View trainer's members \n");
+	printf("[9] Assign member to trainer \n");
+	printf("[10] Remove member from trainer \n");
+	printf("----------------------------------------------- \n");
+	printf("[0] Back to menu \n");
+	printf("-----------------------------------------------\n");
 }
 
-void tm_trainerManagementMenu(TrainerManager *tm_manager, struct Settings *settings)
+void tm_trainerManagementMenu(TrainerManager *tm_manager, struct Settings *settings, MemberManager *mb_manager)
 {
     int choice;
 
@@ -598,17 +643,23 @@ void tm_trainerManagementMenu(TrainerManager *tm_manager, struct Settings *setti
             Pause();
             break;
         case 8:
-            tm_displayTrainerMembers(tm_manager);
+            tm_displayTrainerMembers(tm_manager, mb_manager);
             Pause();
             break;
         case 9:
-            tm_assignMemberToTrainer(tm_manager);
-            if (settings->current_auto_save_mode) tm_saveTrainersToFile(tm_manager);
+            tm_assignMemberToTrainer(tm_manager, mb_manager);
+            if (settings->current_auto_save_mode) {
+                tm_saveTrainersToFile(tm_manager);
+                mm_SaveData(mb_manager);
+            }
             Pause();
             break;
         case 10:
-            tm_removeMemberFromTrainer(tm_manager);
-            if (settings->current_auto_save_mode) tm_saveTrainersToFile(tm_manager);
+            tm_removeMemberFromTrainer(tm_manager, mb_manager);
+            if (settings->current_auto_save_mode) {
+                tm_saveTrainersToFile(tm_manager);
+                mm_SaveData(mb_manager);
+            }
             Pause();
             break;
         case 0:

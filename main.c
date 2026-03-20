@@ -59,7 +59,7 @@ int main()
 				mm_MemberManagement(&member_manager, &settings);
 				break;
 			case 2:
-				tm_trainerManagementMenu(&trainer_manager, &settings);
+				tm_trainerManagementMenu(&trainer_manager, &settings, &member_manager);
 				break;
 			case 3:
 				s_SortManagement(&member_manager, &settings);

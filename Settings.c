@@ -65,20 +65,15 @@ void st_DefaultSettings(Settings *settings)
     st_DarkTheme();
 }
 
-void st_DeleteAllData(MemberManager *member_manager,TrainerManager *trainer_manager)
-{
-    if (member_manager->members != NULL) {
-        free(member_manager->members);
-    }
-    if (trainer_manager->trainers != NULL) {
-        free(trainer_manager->trainers);
-    }
+void st_DeleteAllData(MemberManager *member_manager, TrainerManager *trainer_manager) {
+    free(member_manager->members);
+    free(trainer_manager->trainers);
 
+    member_manager->members = NULL;
     member_manager->count = 0;
-    trainer_manager->count = 0;
-
-    member_manager->members = NULL; 
+    
     trainer_manager->trainers = NULL;
+    trainer_manager->count = 0;
 }
 
 void st_SaveSettings(Settings *settings)

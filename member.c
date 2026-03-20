@@ -54,14 +54,12 @@ void mb_PrintMemberInfo(Member *member)
        "%-20s : %d\n"
        "%-20s : %s\n"
        "%-20s : %s\n"
-       "%-20s : %s\n"
        "%-20s : %s\n",
        "Member full name", member->name,
        "Member birth year", member->birth_year,
        "Member ID",        member->id,
        "Membership type", membership_types[member->membership_type],
-       "Registration date", registration_date,
-	   "Trainer ID", member->trainer_id);
+       "Registration date", registration_date);
 }
 
 void mb_SetName(Member *member, char name[])
@@ -86,7 +84,7 @@ void mb_SetBirthYear(Member *member, int birth_year)
 
 int mb_IsAssigned(Member *member)
 {
-	if(member->trainer_id!=NULL)
+	if(strcmp(member->trainer_id,"NULL")!=0)
 	{
 		return 1;
 	}
