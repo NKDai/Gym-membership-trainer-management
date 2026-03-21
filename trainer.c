@@ -139,9 +139,9 @@ void tm_displayAllTrainers(TrainerManager *tm_manager)
         return;
     }
 
-    printf("\n================================================================= ALL TRAINERS LIST =================================================================\n");
-    printf("%-8s %-20s %-20s %-8s %-15s %-15s\n", "ID", "Name", "Specialty", "Members", "Base Sal.(VND)", "Total Sal.(VND)");
-    printf("=====================================================================================================================================================\n");
+    printf("\n ____________________________________________ALL_TRAINERS_LIST____________________________________________ \n");
+    printf("| %-8s | %-20s | %-20s | %-8s | %-16s | %-16s |\n", "ID", "Name", "Specialty", "Members", "Base Sal.(VND)", "Total Sal.(VND)");
+    printf("|---------------------------------------------------------------------------------------------------------|\n");
 
     for (int i = 0; i < tm_manager->capacity; i++)
     {
@@ -150,7 +150,7 @@ void tm_displayAllTrainers(TrainerManager *tm_manager)
         
         float total_salary = tm_manager->trainers[i].salary * tm_manager->trainers[i].memberCount;
         
-        printf("%-8s %-20s %-20s %-8d %-15.0f %-15.0f\n",
+        printf("| %-8s | %-20s | %-20s | %-8d | %-16.0f | %-16.0f |\n",
                tm_manager->trainers[i].id,
                tm_manager->trainers[i].name,
                tm_manager->trainers[i].specialty,
@@ -158,7 +158,7 @@ void tm_displayAllTrainers(TrainerManager *tm_manager)
                tm_manager->trainers[i].salary,
                total_salary);
     }
-    printf("=====================================================================================================================================================\n");
+    printf("|_________________________________________________________________________________________________________|\n");
 }
 
 void tm_searchTrainerById(TrainerManager *tm_manager)
